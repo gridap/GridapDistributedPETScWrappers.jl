@@ -12,20 +12,20 @@ isfile(depfile) || error("PETSc not properly installed. Please run Pkg.build(\"P
 include(depfile)
 
 const petsc_libs = [:petscRealDouble, :petscRealSingle, :petscComplexDouble]
-const petsc_type = [Float64, Float32, Complex128]
+const petsc_type = [Float64, Float32, ComplexF64]
 
-typealias Scalar Union{Float32, Float64, Complex128}
+const Scalar=Union{Float32, Float64, ComplexF64}
 
-const MPI_COMM_SELF = MPI.COMM_SELF
-typealias MPI_Comm Union{MPI.CComm, MPI.Comm}
-typealias comm_type MPI.CComm
+const MPI_COMM_SELF=MPI.COMM_SELF
+const MPI_Comm=MPI.Comm
+const comm_type=MPI.Comm
 
 # some auxiliary functions used by ccall wrappers
 # get an array of pointers to UInt8s that is the same shape as
 # the Symbol array
 # does *not* allocate the pointers
 function symbol_get_before(sym_arr)
-  ptr_arr = Array{Ptr{UInt8}}(length(sym_arr))
+  ptr_arr = Array{Ptr{UInt8}}(undef,length(sym_arr))
 #  println("ptr_arr = ", ptr_arr)
 #  for i=1:length(sym_arr)
 #    println("ptr_arr[$i] = ", ptr_arr[i])
@@ -39,7 +39,7 @@ function symbol_get_after(ptr, sym_arr)
   ptr_arr = unsafe_wrap(Array, ptr, length(sym_arr))
 
   for i=1:length(sym_arr)
-    sym_arr[i] = unsafe_string(ptr_arr[i])
+    sym_arr[i] = Symbol(unsafe_string(ptr_arr[i]))
   end
 
 end
@@ -55,11 +55,11 @@ end
 
 # TODO: auto-generate these
 function PetscObjectComm(::Type{Float64},arg1::Ptr)
-   ccall((:PetscObjectComm,petscRealDouble),comm_type,(Ptr{Void},),arg1)
+   ccall((:PetscObjectComm,petscRealDouble),comm_type,(Ptr{Cvoid},),arg1)
 end
 function PetscObjectComm(::Type{Float32},arg1::Ptr)
-   ccall((:PetscObjectComm,petscRealSingle),comm_type,(Ptr{Void},),arg1)
+   ccall((:PetscObjectComm,petscRealSingle),comm_type,(Ptr{Cvoid},),arg1)
 end
-function PetscObjectComm(::Type{Complex128},arg1::Ptr)
-   ccall((:PetscObjectComm,petscComplexDouble),comm_type,(Ptr{Void},),arg1)
+function PetscObjectComm(::Type{ComplexF64},arg1::Ptr)
+   ccall((:PetscObjectComm,petscComplexDouble),comm_type,(Ptr{Cvoid},),arg1)
 end

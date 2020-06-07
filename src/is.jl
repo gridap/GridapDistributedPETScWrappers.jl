@@ -5,51 +5,51 @@ export IS, ISBlock # index sets
 # Note: we expose a 1-base Julian index interface, but internally
 # PETSc's indices are 0-based.
 #TODO: support block versions
-type IS{T}
+mutable struct IS{T}
   p::C.IS{T}
-  function IS(p::C.IS{T})
-    o = new(p)
-    finalizer(o, PetscDestroy)
+  function IS{T}(p::C.IS{T}) where {T}
+    o = new{T}(p)
+    finalizer(PetscDestroy,o)
     return o
   end
 end
 
-comm{T}(a::IS{T}) = MPI.Comm(C.PetscObjectComm(T, a.p.pobj))
+comm(a::IS{T}) where{T} = MPI.Comm(C.PetscObjectComm(T, a.p.pobj))
 
-function PetscDestroy{T}(o::IS{T})
+function PetscDestroy(o::IS{T}) where{T}
   PetscFinalized(T) || C.ISDestroy(Ref(o.p))
 end
 
 # internal constructor, takes array of zero-based indices:
-function IS_{T<:Scalar}(::Type{T}, idx::Array{PetscInt}; comm::MPI.Comm=MPI.COMM_WORLD)
+function IS_(::Type{T}, idx::Array{PetscInt}; comm::MPI.Comm=MPI.COMM_WORLD) where {T<:Scalar}
   is_c = Ref{C.IS{T}}()
   chk(C.ISCreateGeneral(comm, length(idx), idx, C.PETSC_COPY_VALUES, is_c))
   return IS{T}(is_c[])
 end
 
-IS{I<:Integer, T<:Scalar}(::Type{T}, idx::AbstractArray{I}; comm::MPI.Comm=MPI.COMM_WORLD) =
+IS(::Type{T}, idx::AbstractArray{I}; comm::MPI.Comm=MPI.COMM_WORLD) where {I<:Integer, T<:Scalar} =
   IS_(T, PetscInt[i-1 for i in idx]; comm=comm)
 
-function IS{I<:Integer, T<:Scalar}(::Type{T}, idx::Range{I}; comm::MPI.Comm=MPI.COMM_WORLD)
+function IS(::Type{T}, idx::AbstractRange{I}; comm::MPI.Comm=MPI.COMM_WORLD) where {I<:Integer, T<:Scalar}
   is_c = Ref{C.IS{T}}()
-  chk(C.ISCreateStride(comm, length(idx), start(idx)-1, step(idx), is_c))
+  chk(C.ISCreateStride(comm, length(idx), first(idx)-1, step(idx), is_c))
   return IS{T}(is_c[])
 end
 
 # there is no Strided block index set, so convert everything to an array
-function ISBlock{I<:Integer, T<:Scalar}(::Type{T}, bs::Integer,  idx::AbstractArray{I}; comm=MPI.COMM_WORLD)
+function ISBlock(::Type{T}, bs::Integer,  idx::AbstractArray{I}; comm=MPI.COMM_WORLD) where {I<:Integer, T<:Scalar}
   idx_0 = PetscInt[i-1 for i in idx]
   return ISBlock_(T, bs, idx_0, comm=comm)
 end
 
-function ISBlock_{T}(::Type{T}, bs::Integer, idx::AbstractArray{PetscInt};comm=MPI.COMM_WORLD)
+function ISBlock_(::Type{T}, bs::Integer, idx::AbstractArray{PetscInt};comm=MPI.COMM_WORLD) where {T}
   is_c = Ref{C.IS{T}}()
   chk(C.ISCreateBlock(comm, bs, length(idx), idx, C.PETSC_COPY_VALUES, is_c))
   return IS{T}(is_c[])
 end
 
 
-function Base.copy{T}(i::IS{T})
+function Base.copy(i::IS{T}) where {T}
   is_c = Ref{C.IS{T}}()
   chk(C.ISDuplicate(i.p, is_c))
   return IS{T}(is_c[])
@@ -68,7 +68,7 @@ function lengthlocal(i::IS)
 end
 
 import Base.==
-function =={T}(i::IS{T}, j::IS{T})
+function ==(i::IS{T}, j::IS{T}) where {T}
   b = Ref{PetscBool}()
   chk(C.ISEqual(i.p, j.p, b))
   return b[] != 0
@@ -86,19 +86,19 @@ function Base.issorted(i::IS)
   return b[] != 0
 end
 
-function Base.union{T}(i::IS{T}, j::IS{T})
+function Base.union(i::IS{T}, j::IS{T}) where {T}
   is_c = Ref{C.IS{T}}()
   chk(C.ISExpand(i.p, j.p, is_c))
   return IS{T}(is_c[])
 end
 
-function Base.setdiff{T}(i::IS{T}, j::IS{T})
+function Base.setdiff(i::IS{T}, j::IS{T}) where {T}
   is_c = Ref{C.IS{T}}()
   chk(C.ISDifference(i.p, j.p, is_c))
   return IS{T}(is_c[])
 end
 
-function Base.extrema(i::IS)
+function Base.extrema(i::IS) where {T}
   min = Ref{PetscInt}()
   max = Ref{PetscInt}()
   chk(C.ISGetMinMax(i.p, min, max))
@@ -107,7 +107,7 @@ end
 Base.minimum(i::IS) = extrema(i)[1]
 Base.maximum(i::IS) = extrema(i)[2]
 
-function Base.convert{T<:Integer}(::Type{Vector{T}}, idx::IS)
+function Base.convert(::Type{Vector{T}}, idx::IS) where {T<:Integer}
   pref = Ref{Ptr{PetscInt}}()
   chk(C.ISGetIndices(idx.p, pref))
   inds = Int[i+1 for i in unsafe_wrap(Array, pref[], lengthlocal(idx))]
@@ -115,7 +115,7 @@ function Base.convert{T<:Integer}(::Type{Vector{T}}, idx::IS)
   return inds
 end
 Base.Set(i::IS) = Set(Vector{Int}(i))
-
+Base.Vector{T}(i::IS) where T<:Integer = convert(Vector{T},i)
 export set_blocksize, get_blocksize
 
 function set_blocksize(is::IS, bs::Integer)
@@ -128,7 +128,7 @@ function get_blocksize(is::IS)
   return Int(bs[])
 end
 
-function petscview{T}(is::IS{T})
+function petscview(is::IS{T}) where {T}
   viewer = C.PetscViewer{T}(C_NULL)
   chk(C.ISView(is.p, viewer))
 end
@@ -139,18 +139,18 @@ end
 
 export ISLocalToGlobalMapping
 
-type ISLocalToGlobalMapping{T}
+mutable struct ISLocalToGlobalMapping{T}
   p::C.ISLocalToGlobalMapping{T}
-  function ISLocalToGlobalMapping(p::C.ISLocalToGlobalMapping{T})
-    o = new(p)
-    finalizer(o, PetscDestroy)
+  function ISLocalToGlobalMapping{T}(p::C.ISLocalToGlobalMapping{T}) where {T}
+    o = new{T}(p)
+    finalizer(PetscDestroy,o)
     return o
   end
 end
 
 
 # zero based, not exported
-function _ISLocalToGlobalMapping{T}(::Type{T}, indices::AbstractArray{PetscInt}, bs=1; comm=MPI_COMM_WORLD, copymode=C.PETSC_COPY_VALUES)
+function _ISLocalToGlobalMapping(::Type{T}, indices::AbstractArray{PetscInt}, bs=1; comm=MPI_COMM_WORLD, copymode=C.PETSC_COPY_VALUES) where {T}
 
   isltog = Ref{C.ISLocalToGlobalMapping}()
   chk(C.ISLocalToGlobalMappingCreate(comm, bs, length(indices), indices, copymode, isltog))
@@ -161,14 +161,14 @@ end
 # one based, exported
 #TODO: add a data argument to ISLocalToGlobalMapping, to store intermediate
 # array for copymode = don't copy
-function ISLocalToGlobalMapping{T, I <: Integer}(::Type{T}, indices::AbstractArray{I}, bs=1; comm=MPI_COMM_WORLD, copymode=C.PETSC_COPY_VALUES)
+function ISLocalToGlobalMapping(::Type{T}, indices::AbstractArray{I}, bs=1; comm=MPI_COMM_WORLD, copymode=C.PETSC_COPY_VALUES) where {T, I <: Integer}
 
   indices_0 = PetscInt[ i-1 for i in indices]
   return _ISLocalToGlobalMapping(t, indices, bs=bs, comm=comm, copymode=copymode)
 
 end
 
-function ISLocalToGlobalMapping{T}(is::IS{T})
+function ISLocalToGlobalMapping(is::IS{T})  where {T}
 
   isltog = Ref{C.ISLocalToGlobalMapping{T}}()
   chk(C.ISLocalToGlobalMappingCreateIS(is.p, isltog))
@@ -176,15 +176,13 @@ function ISLocalToGlobalMapping{T}(is::IS{T})
 end
 
 
-comm{T}(a::ISLocalToGlobalMapping{T}) = MPI.Comm(C.PetscObjectComm(T, a.p.pobj))
+comm(a::ISLocalToGlobalMapping{T}) where {T} = MPI.Comm(C.PetscObjectComm(T, a.p.pobj))
 
-function PetscDestroy{T}(o::ISLocalToGlobalMapping{T})
+function PetscDestroy(o::ISLocalToGlobalMapping{T}) where {T}
   PetscFinalized(T) || C.ISLocalToGlobalMappingDestroy(Ref(o.p))
 end
 
-function petscview{T}(is::ISLocalToGlobalMapping{T})
+function petscview(is::ISLocalToGlobalMapping{T}) where {T}
   viewer = C.PetscViewer{T}(C_NULL)
   chk(C.ISLocalToGlobalMappingView(is.p, viewer))
 end
-
-

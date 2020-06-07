@@ -359,7 +359,7 @@ function add_body(ex)
 
 
         else
-          println(STDERR, "Warning, Symbol type conversion not handled in function ", fname_str)
+          println(stderr, "Warning, Symbol type conversion not handled in function ", fname_str)
 
         end  # end if contains(get)
       end  # end if type_annot_j == ...

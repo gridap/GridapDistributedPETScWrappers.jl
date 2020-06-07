@@ -1,22 +1,22 @@
 export PC, petscview
 
 # preconditioner context
-type PC{T}
+mutable struct PC{T}
   p::C.PC{T}
-  function PC(p::C.PC{T})
-    o = new(p)
-    finalizer(o, PetscDestroy)
+  function PC(p::C.PC{T}) where {T}
+    o = new{T}(p)
+    finalizer(PetscDestroy,o)
     return o
   end
 end
 
-comm{T}(a::PC{T}) = MPI.Comm(C.PetscObjectComm(T, a.p.pobj))
+comm(a::PC{T}) where {T} = C.PetscObjectComm(T, a.p.pobj)
 
-function PetscDestroy{T}(o::PC{T})
+function PetscDestroy(o::PC{T}) where {T}
   PetscFinalized(T) || C.PCDestroy(Ref(o.p))
 end
 
-function petscview{T}(o::PC{T})
+function petscview(o::PC{T}) where {T}
   viewer = C.PetscViewer{T}(C_NULL)
   chk(C.PCView(o.p, viewer))
 end
@@ -33,16 +33,16 @@ The remaining keywords specify zero or more additional options:
 * `pc_use_amat=true`: use Amat (instead of Pmat) to define preconditioner in nested inner solves
 * ... additional options that depend on the preconditioner type ...
 """
-function PC{T}(::Type{T}; comm::MPI.Comm=MPI.COMM_SELF, kws...)
+function PC(::Type{T}; comm::MPI.Comm=MPI.COMM_SELF, kws...) where {T}
   pc_c = Ref{C.PC{T}}()
   chk(C.PCCreate(comm, pc_c))
   withoptions(T, kws) do
     chk(C.PCSetFromOptions(pc_c[]))
   end
-  return PC{T}(pc_c[])
+  return PC(pc_c[])
 end
 
-function PC{T}(A::Mat{T}, PA::Mat{T}=A; kws...)
+function PC(A::Mat{T}, PA::Mat{T}=A; kws...) where {T}
   pc_c = Ref{C.PC{T}}()
   chk(C.PCCreate(comm(A), pc_c))
   pc = pc_c[]
@@ -50,5 +50,5 @@ function PC{T}(A::Mat{T}, PA::Mat{T}=A; kws...)
   withoptions(T, kws) do
     chk(C.PCSetFromOptions(pc))
   end
-  return PC{T}(pc)
+  return PC(pc)
 end

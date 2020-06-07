@@ -7,8 +7,12 @@ using .C
 include("petsc_com.jl")
 include("options.jl")
 include("is.jl")
+
+using LinearAlgebra
 include("vec.jl")
+using SparseArrays
 include("mat.jl")
+
 include("vec_scatter.jl")
 include("pc.jl")
 include("ksp.jl")

@@ -3,16 +3,16 @@ export TS, set_ic, set_times, solve!, set_rhs_function, set_rhs_jac
 export set_lhs_function, set_lhs_jac
 export ComputeRHSFunctionLinear, ComputeRHSJacobianConstant
 
-type TS{T}
+mutable struct TS{T}
   p::C.TS{T}
   data::Array{Any, 1}  # hold the various ctx tuples
-  function TS(p, data=nothing; first_instance=false)
-    data_arr = Array{Any}(0)
-    ts = new(p, data_arr)
+  function TS{T}(p::C.TS{T}, data=nothing; first_instance=false) where {T}
+    data_arr = Any[]
+    ts = new{T}(p, data_arr)
     push!(ts.data, data)
 
     if first_instance
-      finalizer(ts, PetscDestroy)
+      finalizer(PetscDestroy, ts)
     end
 
     return ts
@@ -20,7 +20,7 @@ type TS{T}
 end
 
 
-function PetscDestroy{T}(ts::TS{T})
+function PetscDestroy(ts::TS{T}) where {T}
   if !PetscFinalized(T) && !isfinalized(ts)
     ts_ref = Ref(ts.p)
     chk(C.TSDestroy(ts_ref))
@@ -37,7 +37,7 @@ function isfinalized(ts::C.TS)
 end
 
 #get the internal KSP object for this TS
-function KSP{T}(ts::TS{T})
+function KSP(ts::TS{T}) where {T}
   ksp_c = Ref{C.KSP{T}}()
   chk(C.TSGetKSP(ts.p, ksp_c))
   return KSP{T}(ksp_c[])
@@ -47,7 +47,7 @@ end
   Most preferred constructor: take ProblemType, method from options
   database
 """
-function TS{T<:Scalar}(::Type{T} ;comm=MPI.COMM_WORLD)
+function TS(::Type{T} ;comm=MPI.COMM_WORLD) where {T<:Scalar}
   ts = Ref{C.TS{T}}()
   chk(C.TSCreate(comm, ts))
   return TS{T}(ts[])
@@ -57,7 +57,7 @@ end
   Preferred constructor: set problem type explicitly, get method from
   options database
 """
-function TS{T<:Scalar}(::Type{T}, tsptype::C.TSProblemType; comm=MPI.COMM_WORLD)
+function TS(::Type{T}, tsptype::C.TSProblemType; comm=MPI.COMM_WORLD) where {T<:Scalar}
 
   ts = TS(T, comm=comm)
   chk(C.TSSetProblemType(ts.p, tsptype))
@@ -76,8 +76,8 @@ end
 `tstype` sets the method used to solve the problem. More information
 about the possible methods is available at the official PETSc [docs](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSType.html).
 """
-function TS{T<:Scalar}(::Type{T}, tsptype::C.TSProblemType, tstype::C.TSType;
-                       comm=MPI.COMM_WORLD)
+function TS(::Type{T}, tsptype::C.TSProblemType, tstype::C.TSType;
+                       comm=MPI.COMM_WORLD) where {T<:Scalar}
 
   ts = TS(T, tsptype, comm=comm)
   chk(C.TSSetType(ts.p, tstype))
@@ -86,7 +86,7 @@ function TS{T<:Scalar}(::Type{T}, tsptype::C.TSProblemType, tstype::C.TSType;
 end
 
 
-function set_ic{T<:Scalar}(ts::TS{T}, u::Vec{T})
+function set_ic(ts::TS{T}, u::Vec{T}) where {T<:Scalar}
   chk(C.TSSetSolution(ts.p, u.p))
 end
 
@@ -97,14 +97,14 @@ end
     nsteps: maximum number of steps
     tmax: maximum time value
 """
-function set_times{T<:Scalar}(ts::TS{T}, t0, dt0,  nsteps::Integer, tmax)
+function set_times(ts::TS{T}, t0, dt0,  nsteps::Integer, tmax) where {T<:Scalar}
   TR = real(T)  # PetscReal
 
   chk(C.TSSetInitialTimeStep(ts.p, TR(t0), TR(dt0)))
   chk(C.TSSetDuration(ts.p, nsteps, TR(tmax)))
 end
 
-function petscview{T}(ts::TS{T})
+function petscview(ts::TS{T}) where {T<:Scalar}
   viewer = C.PetscViewer{T}(C_NULL)
   chk(C.TSView(ts.p, viewer))
 end
@@ -112,7 +112,7 @@ end
 """
   Solve the system using the initial condition provided in vec
 """
-function solve!{T}(ts::TS{T}, vec::Vec{T})
+function solve!(ts::TS{T}, vec::Vec{T}) where {T}
 
   chk(C.TSSolve(ts.p, vec.p))
 end
@@ -120,7 +120,7 @@ end
 """
   Solve the system using the intitial condition proived by set_ic
 """
-function solve!{T}(ts::TS{T})
+function solve!(ts::TS{T}) where {T}
 
   vecp = C.Vec{T}(C_NULL)
   chk(C.TSSolve(ts.p, vecp))
@@ -131,37 +131,13 @@ end
 # right hand side function
 
 """
-  Sets the function that evalutes u_t = g(u, t) for an ODE.
-  The function must have the signature:
-
-  f(TS, t, U, F, ctx)
-
-  where TS is a TS object,
-  t is the current time
-  u is the current state vector
-  F is the vector to be populated with u_t
-  ctx is the user supplied context tuple (empty tuple if not provided)
-"""
-function set_rhs_function{T}(ts::TS{T}, r::Vec{T}, f::Function, ctx=())
-
-  ctx_outer = (f, ctx)
-  push!(ts.data, ctx_outer)
-  ctx_ptr = pointer_from_objref(ctx_outer)
-  Treal = real(T)
-  # this this pre-compilable?
-  fptr = cfunction(rhs_wrapper, PetscErrorCode, (C.TS{T}, Treal, C.Vec{T}, C.Vec{T}, Ptr{Void}))
-
-  chk(C.TSSetRHSFunction(ts.p, r.p, fptr, ctx_ptr))
-end
-
-"""
   Wrapper for the right hand side function.  This function is always passed
   to PETSc as the right hand side function, and calls the user supplied
   function internally.  The user supplied function must be the first
   component of the ctx tuple
 
 """
-function rhs_wrapper{T}(ts::C.TS{T}, t, u::C.Vec{T}, F::C.Vec{T}, ctx_ptr::Ptr{Void})
+function rhs_wrapper(ts::C.TS{T}, t, u::C.Vec{T}, F::C.Vec{T}, ctx_ptr::Ptr{Cvoid}) where {T}
 
   Treal = real(T)
   # transform into high level objects
@@ -177,6 +153,35 @@ function rhs_wrapper{T}(ts::C.TS{T}, t, u::C.Vec{T}, F::C.Vec{T}, ctx_ptr::Ptr{V
   return PetscErrorCode(ret_status)
 end
 
+
+"""
+  Sets the function that evalutes u_t = g(u, t) for an ODE.
+  The function must have the signature:
+
+  f(TS, t, U, F, ctx)
+
+  where TS is a TS object,
+  t is the current time
+  u is the current state vector
+  F is the vector to be populated with u_t
+  ctx is the user supplied context tuple (empty tuple if not provided)
+"""
+function set_rhs_function(ts::TS{T}, r::Vec{T}, f::Function, ctx=()) where {T}
+
+  ctx_outer = (f, ctx)
+  push!(ts.data, ctx_outer)
+  #ctx_ptr = pointer_from_objref(ctx_outer)
+  Treal = real(T)
+  # this this pre-compilable?
+  #fptr = @cfunction(rhs_wrapper, PetscErrorCode, (C.TS{T}, Treal, C.Vec{T}, C.Vec{T}, Ptr{Cvoid}))
+  fptr = @cfunction(rhs_wrapper, PetscErrorCode, (C.TS{T}, T, C.Vec{T}, C.Vec{T}, Ptr{Cvoid}))
+
+
+  chk(C.TSSetRHSFunction(ts.p, r.p, fptr, ctx_ptr))
+end
+
+
+
 # a PETSc provided rhs function for the linear, time invarient coefficient
 # matrix case
 
@@ -188,22 +193,7 @@ end
 
 ###############################################################################
 # right hand side jacobian
-
-function set_rhs_jac{T}(ts::TS{T}, A::Mat{T}, B::Mat{T}, f::Function, ctx=())
-
-  ctx_outer = (f, ctx)
-  push!(ts.data, ctx_outer)
-  ctx_ptr = pointer_from_objref(ctx_outer)
-  Treal = real(T)
-  # this this pre-compilable?
-  fptr = cfunction(rhs_jac_wrapper, PetscErrorCode, (C.TS{T}, Treal, C.Vec{T}, C.Mat{T}, C.Mat{T}, Ptr{Void}))
-
-  chk(C.TSSetRHSJacobian(ts.p, A.p, B.p, fptr, ctx_ptr))
-end
-
-
-
-function rhs_jac_wrapper{T}(ts::C.TS{T}, t, u::C.Vec{T}, A::C.Mat{T}, B::C.Mat{T}, ctx_ptr::Ptr{Void})
+function rhs_jac_wrapper(ts::C.TS{T}, t, u::C.Vec{T}, A::C.Mat{T}, B::C.Mat{T}, ctx_ptr::Ptr{Cvoid}) where {T}
 
   Treal = real(T)
   bigts = TS{T}(ts, first_instance=false)
@@ -220,6 +210,19 @@ function rhs_jac_wrapper{T}(ts::C.TS{T}, t, u::C.Vec{T}, A::C.Mat{T}, B::C.Mat{T
   return PetscErrorCode(ret_status)
 end
 
+function set_rhs_jac(ts::TS{T}, A::Mat{T}, B::Mat{T}, f::Function, ctx=()) where {T}
+
+  ctx_outer = (f, ctx)
+  push!(ts.data, ctx_outer)
+  ctx_ptr = pointer_from_objref(ctx_outer)
+  Treal = real(T)
+  # this this pre-compilable?
+  #fptr = @cfunction(rhs_jac_wrapper, PetscErrorCode, (C.TS{T}, Treal, C.Vec{T}, C.Mat{T}, C.Mat{T}, Ptr{Cvoid}))
+  fptr = @cfunction(rhs_jac_wrapper, PetscErrorCode, (C.TS{T}, T, C.Vec{T}, C.Mat{T}, C.Mat{T}, Ptr{Cvoid}))
+
+  chk(C.TSSetRHSJacobian(ts.p, A.p, B.p, fptr, ctx_ptr))
+end
+
 # a PETSc provided rhs jacobian function for time invarient jacobians
 function ComputeRHSJacobianConstant(ts::TS, t, u::Vec, A::Mat, B::Mat, ctx::Tuple)
 
@@ -229,20 +232,22 @@ end
 ###############################################################################
 # left hand side function
 
-function set_lhs_function{T}(ts::TS{T}, res::Vec{T}, f::Function, ctx::Tuple=())
+function set_lhs_function(ts::TS{T}, res::Vec{T}, f::Function, ctx::Tuple=()) where {T}
 
   ctx_outer = (f, ctx)
   push!(ts.data, ctx_outer)
   ctx_ptr = pointer_from_objref(ctx_outer)
   Treal = real(T)
 
-  fptr = cfunction(lhs_wrapper, PetscErrorCode, (C.TS{T}, Treal, C.Vec{T}, C.Vec{T}, C.Vec{T}, Ptr{Void}))
+  #fptr = @cfunction(lhs_wrapper, PetscErrorCode, (C.TS{T}, Treal, C.Vec{T}, C.Vec{T}, C.Vec{T}, Ptr{Cvoid}))
+  fptr = @cfunction(rhs_jac_wrapper, PetscErrorCode, (C.TS{T}, T, C.Vec{T}, C.Mat{T}, C.Mat{T}, Ptr{Cvoid}))
+
 
   chk(C.TSSetIFunction(ts.p, res.p, fptr, ctx_ptr))
   return nothing
 end
 
-function lhs_wrapper{T}(ts::C.TS{T}, t, u::C.Vec{T}, ut::C.Vec{T}, F::C.Vec{T}, ctx_ptr::Ptr{Void})
+function lhs_wrapper(ts::C.TS{T}, t, u::C.Vec{T}, ut::C.Vec{T}, F::C.Vec{T}, ctx_ptr::Ptr{Cvoid}) where {T}
 
   Treal = real(T)
   # transform into high level objects
@@ -262,20 +267,7 @@ end
 ###############################################################################
 # left hand side jacobian
 
-function set_lhs_jac{T}(ts::TS{T}, A::Mat{T}, B::Mat{T}, f::Function, ctx::Tuple=())
-
-  ctx_outer = (f, ctx)
-  push!(ts.data, ctx_outer)
-  ctx_ptr = pointer_from_objref(ctx_outer)
-  Treal = real(T)
-
-  fptr = cfunction(lhs_jac_wrapper, PetscErrorCode, (C.TS{T}, Treal, C.Vec{T}, C.Vec{T}, Treal, C.Mat{T}, C.Mat{T}, Ptr{Void}))
-
-  chk(C.TSSetIJacobian(ts.p, A.p, B.p, fptr, ctx_ptr))
-end
-
-
-function lhs_jac_wrapper{T}(ts::C.TS{T}, t, u::C.Vec{T}, ut::C.Vec{T}, a, A::C.Mat{T}, B::C.Mat{T}, ctx_ptr::Ptr{Void})
+function lhs_jac_wrapper(ts::C.TS{T}, t, u::C.Vec{T}, ut::C.Vec{T}, a, A::C.Mat{T}, B::C.Mat{T}, ctx_ptr::Ptr{Cvoid}) where {T}
 
   Treal = real(T)
   bigts = TS{T}(ts, first_instance=false)
@@ -290,4 +282,18 @@ function lhs_jac_wrapper{T}(ts::C.TS{T}, t, u::C.Vec{T}, ut::C.Vec{T}, a, A::C.M
 
   ret_status = func(bigts, bigu, bigut, Treal(a), bigA, bigB, ctx_inner)
   return PetscErrorCode(ret_status)
+end
+
+
+function set_lhs_jac(ts::TS{T}, A::Mat{T}, B::Mat{T}, f::Function, ctx::Tuple=()) where {T}
+
+  ctx_outer = (f, ctx)
+  push!(ts.data, ctx_outer)
+  ctx_ptr = pointer_from_objref(ctx_outer)
+  Treal = real(T)
+
+  #fptr = @cfunction(lhs_jac_wrapper, PetscErrorCode, (C.TS{T}, Treal, C.Vec{T}, C.Vec{T}, Treal, C.Mat{T}, C.Mat{T}, Ptr{Cvoid}))
+  fptr = @cfunction(lhs_jac_wrapper, PetscErrorCode, (C.TS{T}, T, C.Vec{T}, C.Vec{T}, T, C.Mat{T}, C.Mat{T}, Ptr{Cvoid}))
+
+  chk(C.TSSetIJacobian(ts.p, A.p, B.p, fptr, ctx_ptr))
 end

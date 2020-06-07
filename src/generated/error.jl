@@ -10,7 +10,7 @@ function chk(errnum)
   errnum
 end
 
-immutable PetscError <: Exception
+struct PetscError <: Exception
   errnum::PetscErrorCode
   msg::AbstractString
 
@@ -27,7 +27,7 @@ end
 function PetscErrorMessage(errnum)
   msg_ptr = Ref{Ptr{UInt8}}(C_NULL)
   # use the first petsc library for all cases
-  println(STDERR, "errnum = ", errnum)
+  println(stderr, "errnum = ", errnum)
   C.PetscErrorMessage(C.petsc_type[1], errnum, msg_ptr, Ref{Ptr{UInt8}}(C_NULL))
   # error num strings are stored in a constant table so
   # the pointer does not have to be free'd here

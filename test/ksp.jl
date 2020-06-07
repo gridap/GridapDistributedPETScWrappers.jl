@@ -20,6 +20,7 @@
 
   @testset "ksp GMRES solves" begin
       kspg = PETSc.KSP(A)
+      KSPSetUp!(kspg)
       x = kspg\b
       x_julia = A_julia\b_julia
       @test x ≈ x_julia
@@ -28,7 +29,7 @@
       @test x ≈ x_julia
 
       x = KSPSolveTranspose(kspg, b)
-      x_julia = A_julia.'\b_julia
+      x_julia = transpose(A_julia)\b_julia
       @test x ≈ x_julia
 
       x = KSPSolveTranspose(A, b)

@@ -2,18 +2,18 @@
 # dictionary-like object that is analogous to the Julia Base.ENV object
 # for environment variables.
 
-type Options{T<:Scalar} <: Associative{String,String}; end
+mutable struct Options{T<:Scalar} <: AbstractDict{String,String}; end
 const OPTIONS = Dict(T => Options{T}() for T in C.petsc_type)
 export OPTIONS, withoptions
 
-typealias SymOrStr Union{AbstractString,Symbol}
+const SymOrStr = Union{AbstractString,Symbol}
 
-function Base.setindex!{T}(::Options{T}, v, k::SymOrStr)
+function Base.setindex!(::Options{T}, v, k::SymOrStr) where {T}
   chk(C.PetscOptionsSetValue(T, string('-',k), string(v)))
   return v
 end
 
-function Base.setindex!{T}(::Options{T}, v::Void, k::SymOrStr)
+function Base.setindex!(::Options{T}, v::Cvoid, k::SymOrStr) where {T}
   chk(C.PetscOptionsClearValue(T, string('-',k)))
   return v
 end
@@ -27,8 +27,8 @@ function Base.setindex!(o::typeof(OPTIONS), v, k::SymOrStr)
   return v
 end
 
-const _optionstr = Array{UInt8}(1024)
-function Base.get{T}(::Options{T}, k::SymOrStr, def)
+const _optionstr = fill(UInt8(0),1024)
+function Base.get(::Options{T}, k::SymOrStr, def) where {T}
   b = Ref{PetscBool}()
   chk(C.PetscOptionsGetString(T, Cstring(Ptr{UInt8}(C_NULL)), string('-',k),
                               pointer(_optionstr), Csize_t(length(_optionstr)),
@@ -36,7 +36,7 @@ function Base.get{T}(::Options{T}, k::SymOrStr, def)
   return b[] != 0 ? unsafe_string(pointer(_optionstr)) : def
 end
 
-function Base.haskey{T}(::Options{T}, k::SymOrStr)
+function Base.haskey(::Options{T}, k::SymOrStr) where {T}
   b = Ref{PetscBool}()
   chk(C.PetscOptionsHasName(T, Cstring(Ptr{UInt8}(C_NULL)), string('-',k), b))
   return b[] != 0
@@ -51,10 +51,10 @@ Base.delete!(o::Options, k::SymOrStr, def) = haskey(o,k) ? delete!(o,k) : def
 
 # need to override show: default show function doesn't work because
 # there seems to be no way to iterate over the PETSc options database (grr).
-Base.show{T}(io::IO, ::Options{T}) = print(io, "PETSc{$T} options database")
+Base.show(io::IO, ::Options{T})  where {T} = print(io, "PETSc{$T} options database")
 
 # temporarily set some options, call f, and then unset them; like withenv
-function withoptions{T<:Scalar}(f::Function, ::Type{T}, keyvals)
+function withoptions(f::Function, ::Type{T}, keyvals) where {T<:Scalar}
   old = Dict{SymOrStr,Any}()
   o = OPTIONS[T]
   for (key,val) in keyvals
@@ -68,5 +68,5 @@ function withoptions{T<:Scalar}(f::Function, ::Type{T}, keyvals)
     end
   end
 end
-withoptions{T<:Scalar,K<:SymOrStr}(f::Function, ::Type{T}, keyvals::Pair{K}...) = withoptions(f, T, keyvals)
-withoptions{T<:Scalar}(f::Function, ::Type{T}) = f() # handle empty keyvals case; see julia#10853
+withoptions(f::Function, ::Type{T}, keyvals::Pair{K}...) where {T<:Scalar,K<:SymOrStr} = withoptions(f, T, keyvals)
+withoptions(f::Function, ::Type{T}) where {T<:Scalar} = f() # handle empty keyvals case; see julia#10853

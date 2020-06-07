@@ -155,7 +155,7 @@ const PETSC_COMM_SELF = MPI_COMM_SELF
 #= # Skipping MacroDefinition: PetscFree7 ( m1 , m2 , m3 , m4 , m5 , m6 , m7 ) ( PetscFree ( m7 ) || PetscFree ( m6 ) || PetscFree ( m5 ) || PetscFree ( m4 ) || PetscFree ( m3 ) || PetscFree ( m2 ) || PetscFree ( m1 ) ) =#
 #skipping undefined const MPIU_PETSCLOGDOUBLE = MPI_DOUBLE
 #= # begin enum PetscDataType =#
-typealias PetscDataType UInt32
+const  PetscDataType = UInt32
 
 const PETSC_INT = (UInt32)(0)
 const PETSC_DOUBLE = (UInt32)(1)
@@ -446,7 +446,7 @@ const VECPTHREAD = Symbol("pthread")
 const VEC_FILE_CLASSID = 1211214
 
 #= # begin enum NormType =#
-typealias NormType UInt32
+const  NormType = UInt32
 
 const NORM_1 = (UInt32)(0)
 const NORM_2 = (UInt32)(1)
@@ -692,7 +692,7 @@ const PCBDDC = Symbol("bddc")
 const PCKACZMARZ = Symbol("kaczmarz")
 
 #= # begin enum PCSide =#
-typealias PCSide Cint
+const  PCSide = Cint
 
 const PC_SIDE_DEFAULT = (Int32)(-1)
 const PC_LEFT = (Int32)(0)
@@ -708,7 +708,7 @@ const PCGAMGCLASSICALDIRECT = Symbol("direct")
 const PCGAMGCLASSICALSTANDARD = Symbol("standard")
 
 #= # begin enum PCMGType =#
-typealias PCMGType UInt32
+const  PCMGType = UInt32
 
 const PC_MG_MULTIPLICATIVE = (UInt32)(0)
 const PC_MG_ADDITIVE = (UInt32)(1)
@@ -755,7 +755,7 @@ const KSPGCR = Symbol("gcr")
 const KSP_FILE_CLASSID = 1211223
 
 #= # begin enum KSPNormType =#
-typealias KSPNormType Cint
+const  KSPNormType = Cint
 
 const KSP_NORM_DEFAULT = (Int32)(-1)
 const KSP_NORM_NONE = (Int32)(0)
@@ -909,50 +909,50 @@ const TAOLINESEARCHARMIJO = Symbol("armijo")
 const TAOLINESEARCHOWARMIJO = Symbol("owarmijo")
 const TAOLINESEARCHIPM = Symbol("ipm")
 
-typealias PetscErrorCode Cint
-typealias PetscClassId Cint
-typealias PetscMPIInt Cint
+const  PetscErrorCode = Cint
+const  PetscClassId = Cint
+const  PetscMPIInt = Cint
 
 #= # begin enum ANONYMOUS_1 =#
-typealias ANONYMOUS_1 UInt32
+const  ANONYMOUS_1 = UInt32
 
 const ENUM_DUMMY = (UInt32)(0)
 
 #= # end enum ANONYMOUS_1 =#
 #= # begin enum PetscEnum =#
-typealias PetscEnum UInt32
+const  PetscEnum = UInt32
 
 const ENUM_DUMMY = (UInt32)(0)
 
 #= # end enum PetscEnum =#
-typealias Petsc64bitInt Int64
+const  Petsc64bitInt = Int64
 
 # excluding lhs of  typealias PetscInt Petsc64bitInt
-typealias PetscBLASInt Cint
+const  PetscBLASInt = Cint
 
 #= # begin enum ANONYMOUS_2 =#
-typealias ANONYMOUS_2 UInt32
+const  ANONYMOUS_2 = UInt32
 
 const PETSC_PRECISION_SINGLE = (UInt32)(4)
 const PETSC_PRECISION_DOUBLE = (UInt32)(8)
 
 #= # end enum ANONYMOUS_2 =#
 #= # begin enum PetscPrecision =#
-typealias PetscPrecision UInt32
+const  PetscPrecision = UInt32
 
 const PETSC_PRECISION_SINGLE = (UInt32)(4)
 const PETSC_PRECISION_DOUBLE = (UInt32)(8)
 
 #= # end enum PetscPrecision =#
 #= # begin enum ANONYMOUS_3 =#
-typealias ANONYMOUS_3 UInt32
+const  ANONYMOUS_3 = UInt32
 
 const PETSC_FALSE = (UInt32)(0)
 const PETSC_TRUE = (UInt32)(1)
 
 #= # end enum ANONYMOUS_3 =#
 #= # begin enum PetscBool =#
-typealias PetscBool UInt32
+const  PetscBool = UInt32
 
 const PETSC_FALSE = (UInt32)(0)
 const PETSC_TRUE = (UInt32)(1)
@@ -960,7 +960,7 @@ const PETSC_TRUE = (UInt32)(1)
 #= # end enum PetscBool =#
 # skipping undefined typealias typealias PetscComplex Complex
 #= # begin enum ANONYMOUS_4 =#
-typealias ANONYMOUS_4 UInt32
+const  ANONYMOUS_4 = UInt32
 
 const PETSC_SCALAR_DOUBLE = (UInt32)(0)
 const PETSC_SCALAR_SINGLE = (UInt32)(1)
@@ -968,30 +968,30 @@ const PETSC_SCALAR_LONG_DOUBLE = (UInt32)(2)
 
 #= # end enum ANONYMOUS_4 =#
 #= # begin enum PetscScalarPrecision =#
-typealias PetscScalarPrecision UInt32
+const  PetscScalarPrecision = UInt32
 
 const PETSC_SCALAR_DOUBLE = (UInt32)(0)
 const PETSC_SCALAR_SINGLE = (UInt32)(1)
 const PETSC_SCALAR_LONG_DOUBLE = (UInt32)(2)
 
 #= # end enum PetscScalarPrecision =#
-typealias MatScalar Float64
-typealias MatReal Float64
+const  MatScalar = Float64
+const  MatReal = Float64
 
 #= skipping type declaration with undefined symbols:
-immutable petsc_mpiu_2scalar
+struct petsc_mpiu_2scalar
     a::PetscScalar
     b::PetscScalar
-end 
+end
 =#
 #= skipping type declaration with undefined symbols:
-immutable petsc_mpiu_2int
+struct petsc_mpiu_2int
     a::PetscInt
     b::PetscInt
-end 
+end
 =#
 #= # begin enum ANONYMOUS_5 =#
-typealias ANONYMOUS_5 UInt32
+const  ANONYMOUS_5 = UInt32
 
 const PETSC_COPY_VALUES = (UInt32)(0)
 const PETSC_OWN_POINTER = (UInt32)(1)
@@ -999,17 +999,17 @@ const PETSC_USE_POINTER = (UInt32)(2)
 
 #= # end enum ANONYMOUS_5 =#
 #= # begin enum PetscCopyMode =#
-typealias PetscCopyMode UInt32
+const  PetscCopyMode = UInt32
 
 const PETSC_COPY_VALUES = (UInt32)(0)
 const PETSC_OWN_POINTER = (UInt32)(1)
 const PETSC_USE_POINTER = (UInt32)(2)
 
 #= # end enum PetscCopyMode =#
-typealias PetscLogDouble Cdouble
+const  PetscLogDouble = Cdouble
 
 #= # begin enum ANONYMOUS_6 =#
-typealias ANONYMOUS_6 UInt32
+const  ANONYMOUS_6 = UInt32
 
 const PETSC_INT = (UInt32)(0)
 const PETSC_DOUBLE = (UInt32)(1)
@@ -1027,25 +1027,25 @@ const PETSC_FUNCTION = (UInt32)(12)
 const PETSC_STRING = (UInt32)(12)
 
 #= # end enum ANONYMOUS_6 =#
-immutable _p_PetscToken
+struct _p_PetscToken
 end
 
-typealias PetscToken Ptr{_p_PetscToken}
+const  PetscToken = Ptr{_p_PetscToken}
 
-immutable _p_PetscObject
+struct _p_PetscObject
 end
 
-typealias PetscObject Ptr{_p_PetscObject}
-typealias PetscObjectId Petsc64bitInt
-typealias PetscObjectState Petsc64bitInt
+const  PetscObject = Ptr{_p_PetscObject}
+const  PetscObjectId = Petsc64bitInt
+const  PetscObjectState = Petsc64bitInt
 
-immutable _n_PetscFunctionList
+struct _n_PetscFunctionList
 end
 
-typealias PetscFunctionList Ptr{_n_PetscFunctionList}
+const  PetscFunctionList = Ptr{_n_PetscFunctionList}
 
 #= # begin enum ANONYMOUS_7 =#
-typealias ANONYMOUS_7 UInt32
+const  ANONYMOUS_7 = UInt32
 
 const FILE_MODE_READ = (UInt32)(0)
 const FILE_MODE_WRITE = (UInt32)(1)
@@ -1055,7 +1055,7 @@ const FILE_MODE_APPEND_UPDATE = (UInt32)(4)
 
 #= # end enum ANONYMOUS_7 =#
 #= # begin enum PetscFileMode =#
-typealias PetscFileMode UInt32
+const  PetscFileMode = UInt32
 
 const FILE_MODE_READ = (UInt32)(0)
 const FILE_MODE_WRITE = (UInt32)(1)
@@ -1065,7 +1065,7 @@ const FILE_MODE_APPEND_UPDATE = (UInt32)(4)
 
 #= # end enum PetscFileMode =#
 #= # begin enum ANONYMOUS_8 =#
-typealias ANONYMOUS_8 UInt32
+const  ANONYMOUS_8 = UInt32
 
 const PETSC_ERROR_INITIAL = (UInt32)(0)
 const PETSC_ERROR_REPEAT = (UInt32)(1)
@@ -1073,7 +1073,7 @@ const PETSC_ERROR_IN_CXX = (UInt32)(2)
 
 #= # end enum ANONYMOUS_8 =#
 #= # begin enum PetscErrorType =#
-typealias PetscErrorType UInt32
+const  PetscErrorType = UInt32
 
 const PETSC_ERROR_INITIAL = (UInt32)(0)
 const PETSC_ERROR_REPEAT = (UInt32)(1)
@@ -1081,20 +1081,20 @@ const PETSC_ERROR_IN_CXX = (UInt32)(2)
 
 #= # end enum PetscErrorType =#
 #= # begin enum ANONYMOUS_9 =#
-typealias ANONYMOUS_9 UInt32
+const  ANONYMOUS_9 = UInt32
 
 const PETSC_FP_TRAP_OFF = (UInt32)(0)
 const PETSC_FP_TRAP_ON = (UInt32)(1)
 
 #= # end enum ANONYMOUS_9 =#
 #= # begin enum PetscFPTrap =#
-typealias PetscFPTrap UInt32
+const  PetscFPTrap = UInt32
 
 const PETSC_FP_TRAP_OFF = (UInt32)(0)
 const PETSC_FP_TRAP_ON = (UInt32)(1)
 
 #= # end enum PetscFPTrap =#
-immutable Array_64_Ptr
+struct Array_64_Ptr
     d1::Ptr{UInt8}
     d2::Ptr{UInt8}
     d3::Ptr{UInt8}
@@ -1165,7 +1165,7 @@ zero(::Type{Array_64_Ptr}) = begin  # /home/jared/.julia/v0.4/Clang/src/wrap_c.j
         Array_64_Ptr(fill(zero(Ptr{UInt8}),64)...)
     end
 
-immutable Array_64_Cint
+struct Array_64_Cint
     d1::Cint
     d2::Cint
     d3::Cint
@@ -1236,7 +1236,7 @@ zero(::Type{Array_64_Cint}) = begin  # /home/jared/.julia/v0.4/Clang/src/wrap_c.
         Array_64_Cint(fill(zero(Cint),64)...)
     end
 
-immutable Array_64_PetscBool
+struct Array_64_PetscBool
     d1::PetscBool
     d2::PetscBool
     d3::PetscBool
@@ -1307,7 +1307,7 @@ zero(::Type{Array_64_PetscBool}) = begin  # /home/jared/.julia/v0.4/Clang/src/wr
         Array_64_PetscBool(fill(zero(PetscBool),64)...)
     end
 
-immutable PetscStack
+struct PetscStack
     _function::Array_64_Ptr
     file::Array_64_Ptr
     line::Array_64_Cint
@@ -1316,19 +1316,19 @@ immutable PetscStack
     hotdepth::Cint
 end
 
-typealias PetscVoidStarFunction Ptr{Ptr{Void}}
-typealias PetscVoidFunction Ptr{Void}
-typealias PetscErrorCodeFunction Ptr{Void}
+const  PetscVoidStarFunction = Ptr{Ptr{Cvoid}}
+const  PetscVoidFunction = Ptr{Cvoid}
+const  PetscErrorCodeFunction = Ptr{Cvoid}
 
-immutable _p_PetscViewer
+struct _p_PetscViewer
 end
 
-immutable PetscViewer{T}
-    pobj::Ptr{Void}
+struct PetscViewer{T}
+    pobj::Ptr{Cvoid}
 end
 
 #= # begin enum ANONYMOUS_10 =#
-typealias ANONYMOUS_10 UInt32
+const  ANONYMOUS_10 = UInt32
 
 const OPTION_INT = (UInt32)(0)
 const OPTION_BOOL = (UInt32)(1)
@@ -1345,7 +1345,7 @@ const OPTION_STRING_ARRAY = (UInt32)(11)
 
 #= # end enum ANONYMOUS_10 =#
 #= # begin enum PetscOptionType =#
-typealias PetscOptionType UInt32
+const  PetscOptionType = UInt32
 
 const OPTION_INT = (UInt32)(0)
 const OPTION_BOOL = (UInt32)(1)
@@ -1361,14 +1361,14 @@ const OPTION_BOOL_ARRAY = (UInt32)(10)
 const OPTION_STRING_ARRAY = (UInt32)(11)
 
 #= # end enum PetscOptionType =#
-immutable PetscOption{T}
-    pobj::Ptr{Void}
+struct PetscOption{T}
+    pobj::Ptr{Cvoid}
 end
 
-immutable _n_PetscOption
+struct _n_PetscOption
     option::Ptr{UInt8}
     text::Ptr{UInt8}
-    data::Ptr{Void}
+    data::Ptr{Cvoid}
     flist::PetscFunctionList
     list::Ptr{Ptr{UInt8}}
     nlist::UInt8
@@ -1378,11 +1378,11 @@ immutable _n_PetscOption
     _type::PetscOptionType
     next::PetscOption
     pman::Ptr{UInt8}
-    edata::Ptr{Void}
+    edata::Ptr{Cvoid}
 end
 
 #= skipping type declaration with undefined symbols:
-immutable _p_PetscOptions
+struct _p_PetscOptions
     count::PetscInt
     next::PetscOption
     prefix::Ptr{UInt8}
@@ -1393,10 +1393,10 @@ immutable _p_PetscOptions
     changedmethod::PetscBool
     alreadyprinted::PetscBool
     object::PetscObject
-end 
+end
 =#
 #= skipping type declaration with undefined symbols:
-immutable PetscOptions
+struct PetscOptions
     count::PetscInt
     next::PetscOption
     prefix::Ptr{UInt8}
@@ -1407,12 +1407,12 @@ immutable PetscOptions
     changedmethod::PetscBool
     alreadyprinted::PetscBool
     object::PetscObject
-end 
+end
 =#
-typealias PetscDLHandle Ptr{Void}
+const  PetscDLHandle = Ptr{Cvoid}
 
 #= # begin enum ANONYMOUS_11 =#
-typealias ANONYMOUS_11 UInt32
+const  ANONYMOUS_11 = UInt32
 
 const PETSC_DL_DECIDE = (UInt32)(0)
 const PETSC_DL_NOW = (UInt32)(1)
@@ -1420,36 +1420,36 @@ const PETSC_DL_LOCAL = (UInt32)(2)
 
 #= # end enum ANONYMOUS_11 =#
 #= # begin enum PetscDLMode =#
-typealias PetscDLMode UInt32
+const  PetscDLMode = UInt32
 
 const PETSC_DL_DECIDE = (UInt32)(0)
 const PETSC_DL_NOW = (UInt32)(1)
 const PETSC_DL_LOCAL = (UInt32)(2)
 
 #= # end enum PetscDLMode =#
-immutable _n_PetscObjectList
+struct _n_PetscObjectList
 end
 
-typealias PetscObjectList Ptr{_n_PetscObjectList}
+const  PetscObjectList = Ptr{_n_PetscObjectList}
 
-immutable _n_PetscDLLibrary
+struct _n_PetscDLLibrary
 end
 
-typealias PetscDLLibrary Ptr{_n_PetscDLLibrary}
-typealias PetscLogEvent Cint
-typealias PetscLogStage Cint
+const  PetscDLLibrary = Ptr{_n_PetscDLLibrary}
+const  PetscLogEvent = Cint
+const  PetscLogStage = Cint
 
-immutable _n_PetscIntStack
+struct _n_PetscIntStack
 end
 
-typealias PetscIntStack Ptr{_n_PetscIntStack}
+const  PetscIntStack = Ptr{_n_PetscIntStack}
 
-immutable PetscClassRegInfo
+struct PetscClassRegInfo
     name::Ptr{UInt8}
     classid::PetscClassId
 end
 
-immutable PetscClassPerfInfo
+struct PetscClassPerfInfo
     id::PetscClassId
     creations::Cint
     destructions::Cint
@@ -1457,28 +1457,28 @@ immutable PetscClassPerfInfo
     descMem::PetscLogDouble
 end
 
-immutable _n_PetscClassRegLog
+struct _n_PetscClassRegLog
     numClasses::Cint
     maxClasses::Cint
     classInfo::Ptr{PetscClassRegInfo}
 end
 
-typealias PetscClassRegLog Ptr{_n_PetscClassRegLog}
+const  PetscClassRegLog = Ptr{_n_PetscClassRegLog}
 
-immutable _n_PetscClassPerfLog
+struct _n_PetscClassPerfLog
     numClasses::Cint
     maxClasses::Cint
     classInfo::Ptr{PetscClassPerfInfo}
 end
 
-typealias PetscClassPerfLog Ptr{_n_PetscClassPerfLog}
+const  PetscClassPerfLog = Ptr{_n_PetscClassPerfLog}
 
-immutable PetscEventRegInfo
+struct PetscEventRegInfo
     name::Ptr{UInt8}
     classid::PetscClassId
 end
 
-immutable PetscEventPerfInfo
+struct PetscEventPerfInfo
     id::Cint
     active::PetscBool
     visible::PetscBool
@@ -1495,23 +1495,23 @@ immutable PetscEventPerfInfo
     numReductions::PetscLogDouble
 end
 
-immutable _n_PetscEventRegLog
+struct _n_PetscEventRegLog
     numEvents::Cint
     maxEvents::Cint
     eventInfo::Ptr{PetscEventRegInfo}
 end
 
-typealias PetscEventRegLog Ptr{_n_PetscEventRegLog}
+const  PetscEventRegLog = Ptr{_n_PetscEventRegLog}
 
-immutable _n_PetscEventPerfLog
+struct _n_PetscEventPerfLog
     numEvents::Cint
     maxEvents::Cint
     eventInfo::Ptr{PetscEventPerfInfo}
 end
 
-typealias PetscEventPerfLog Ptr{_n_PetscEventPerfLog}
+const  PetscEventPerfLog = Ptr{_n_PetscEventPerfLog}
 
-immutable _PetscStageInfo
+struct _PetscStageInfo
     name::Ptr{UInt8}
     used::PetscBool
     perfInfo::PetscEventPerfInfo
@@ -1519,7 +1519,7 @@ immutable _PetscStageInfo
     classLog::PetscClassPerfLog
 end
 
-immutable PetscStageInfo
+struct PetscStageInfo
     name::Ptr{UInt8}
     used::PetscBool
     perfInfo::PetscEventPerfInfo
@@ -1527,7 +1527,7 @@ immutable PetscStageInfo
     classLog::PetscClassPerfLog
 end
 
-immutable _n_PetscStageLog
+struct _n_PetscStageLog
     numStages::Cint
     maxStages::Cint
     stack::PetscIntStack
@@ -1537,21 +1537,21 @@ immutable _n_PetscStageLog
     classLog::PetscClassRegLog
 end
 
-typealias PetscStageLog Ptr{_n_PetscStageLog}
+const  PetscStageLog = Ptr{_n_PetscStageLog}
 
-immutable _p_PetscContainer
+struct _p_PetscContainer
 end
 
-typealias PetscContainer Ptr{_p_PetscContainer}
-typealias PetscRandomType Symbol
+const  PetscContainer = Ptr{_p_PetscContainer}
+const  PetscRandomType = Symbol
 
-immutable _p_PetscRandom
+struct _p_PetscRandom
 end
 
-typealias PetscRandom Ptr{_p_PetscRandom}
+const  PetscRandom = Ptr{_p_PetscRandom}
 
 #= # begin enum ANONYMOUS_12 =#
-typealias ANONYMOUS_12 UInt32
+const  ANONYMOUS_12 = UInt32
 
 const PETSC_BINARY_SEEK_SET = (UInt32)(0)
 const PETSC_BINARY_SEEK_CUR = (UInt32)(1)
@@ -1559,7 +1559,7 @@ const PETSC_BINARY_SEEK_END = (UInt32)(2)
 
 #= # end enum ANONYMOUS_12 =#
 #= # begin enum PetscBinarySeekType =#
-typealias PetscBinarySeekType UInt32
+const  PetscBinarySeekType = UInt32
 
 const PETSC_BINARY_SEEK_SET = (UInt32)(0)
 const PETSC_BINARY_SEEK_CUR = (UInt32)(1)
@@ -1567,7 +1567,7 @@ const PETSC_BINARY_SEEK_END = (UInt32)(2)
 
 #= # end enum PetscBinarySeekType =#
 #= # begin enum ANONYMOUS_13 =#
-typealias ANONYMOUS_13 Cint
+const  ANONYMOUS_13 = Cint
 
 const PETSC_BUILDTWOSIDED_NOTSET = (Int32)(-1)
 const PETSC_BUILDTWOSIDED_ALLREDUCE = (Int32)(0)
@@ -1575,7 +1575,7 @@ const PETSC_BUILDTWOSIDED_IBARRIER = (Int32)(1)
 
 #= # end enum ANONYMOUS_13 =#
 #= # begin enum PetscBuildTwoSidedType =#
-typealias PetscBuildTwoSidedType Cint
+const  PetscBuildTwoSidedType = Cint
 
 const PETSC_BUILDTWOSIDED_NOTSET = (Int32)(-1)
 const PETSC_BUILDTWOSIDED_ALLREDUCE = (Int32)(0)
@@ -1583,7 +1583,7 @@ const PETSC_BUILDTWOSIDED_IBARRIER = (Int32)(1)
 
 #= # end enum PetscBuildTwoSidedType =#
 #= # begin enum ANONYMOUS_14 =#
-typealias ANONYMOUS_14 UInt32
+const  ANONYMOUS_14 = UInt32
 
 const NOT_SET_VALUES = (UInt32)(0)
 const INSERT_VALUES = (UInt32)(1)
@@ -1596,7 +1596,7 @@ const ADD_BC_VALUES = (UInt32)(7)
 
 #= # end enum ANONYMOUS_14 =#
 #= # begin enum InsertMode =#
-typealias InsertMode UInt32
+const  InsertMode = UInt32
 
 const NOT_SET_VALUES = (UInt32)(0)
 const INSERT_VALUES = (UInt32)(1)
@@ -1609,7 +1609,7 @@ const ADD_BC_VALUES = (UInt32)(7)
 
 #= # end enum InsertMode =#
 #= # begin enum ANONYMOUS_15 =#
-typealias ANONYMOUS_15 UInt32
+const  ANONYMOUS_15 = UInt32
 
 const PETSC_SUBCOMM_GENERAL = (UInt32)(0)
 const PETSC_SUBCOMM_CONTIGUOUS = (UInt32)(1)
@@ -1617,14 +1617,14 @@ const PETSC_SUBCOMM_INTERLACED = (UInt32)(2)
 
 #= # end enum ANONYMOUS_15 =#
 #= # begin enum PetscSubcommType =#
-typealias PetscSubcommType UInt32
+const  PetscSubcommType = UInt32
 
 const PETSC_SUBCOMM_GENERAL = (UInt32)(0)
 const PETSC_SUBCOMM_CONTIGUOUS = (UInt32)(1)
 const PETSC_SUBCOMM_INTERLACED = (UInt32)(2)
 
 #= # end enum PetscSubcommType =#
-immutable _n_PetscSubcomm
+struct _n_PetscSubcomm
     parent::MPI_Comm
     dupparent::MPI_Comm
     child::MPI_Comm
@@ -1634,57 +1634,57 @@ immutable _n_PetscSubcomm
     _type::PetscSubcommType
 end
 
-typealias PetscSubcomm Ptr{_n_PetscSubcomm}
+const  PetscSubcomm = Ptr{_n_PetscSubcomm}
 
-immutable _n_PetscSegBuffer
+struct _n_PetscSegBuffer
 end
 
-typealias PetscSegBuffer Ptr{_n_PetscSegBuffer}
+const  PetscSegBuffer = Ptr{_n_PetscSegBuffer}
 
-immutable _n_PetscBag
+struct _n_PetscBag
 end
 
-typealias PetscBag Ptr{_n_PetscBag}
+const  PetscBag = Ptr{_n_PetscBag}
 
-immutable _n_PetscBagItem
+struct _n_PetscBagItem
 end
 
-typealias PetscBagItem Ptr{_n_PetscBagItem}
-typealias PetscViewerType Symbol
-typealias PetscDrawType Symbol
+const  PetscBagItem = Ptr{_n_PetscBagItem}
+const  PetscViewerType = Symbol
+const  PetscDrawType = Symbol
 
-immutable _p_PetscDraw
+struct _p_PetscDraw
 end
 
-typealias PetscDraw Ptr{_p_PetscDraw}
+const  PetscDraw = Ptr{_p_PetscDraw}
 
-immutable _p_PetscDrawAxis
+struct _p_PetscDrawAxis
 end
 
-typealias PetscDrawAxis Ptr{_p_PetscDrawAxis}
+const  PetscDrawAxis = Ptr{_p_PetscDrawAxis}
 
-immutable _p_PetscDrawLG
+struct _p_PetscDrawLG
 end
 
-typealias PetscDrawLG Ptr{_p_PetscDrawLG}
+const  PetscDrawLG = Ptr{_p_PetscDrawLG}
 
-immutable _p_PetscDrawSP
+struct _p_PetscDrawSP
 end
 
-typealias PetscDrawSP Ptr{_p_PetscDrawSP}
+const  PetscDrawSP = Ptr{_p_PetscDrawSP}
 
-immutable _p_PetscDrawHG
+struct _p_PetscDrawHG
 end
 
-typealias PetscDrawHG Ptr{_p_PetscDrawHG}
+const  PetscDrawHG = Ptr{_p_PetscDrawHG}
 
-immutable _p_PetscDrawBar
+struct _p_PetscDrawBar
 end
 
-typealias PetscDrawBar Ptr{_p_PetscDrawBar}
+const  PetscDrawBar = Ptr{_p_PetscDrawBar}
 
 #= # begin enum ANONYMOUS_16 =#
-typealias ANONYMOUS_16 UInt32
+const  ANONYMOUS_16 = UInt32
 
 const PETSC_VIEWER_DEFAULT = (UInt32)(0)
 const PETSC_VIEWER_ASCII_MATLAB = (UInt32)(1)
@@ -1718,7 +1718,7 @@ const PETSC_VIEWER_NOFORMAT = (UInt32)(28)
 
 #= # end enum ANONYMOUS_16 =#
 #= # begin enum PetscViewerFormat =#
-typealias PetscViewerFormat UInt32
+const  PetscViewerFormat = UInt32
 
 const PETSC_VIEWER_DEFAULT = (UInt32)(0)
 const PETSC_VIEWER_ASCII_MATLAB = (UInt32)(1)
@@ -1752,7 +1752,7 @@ const PETSC_VIEWER_NOFORMAT = (UInt32)(28)
 
 #= # end enum PetscViewerFormat =#
 #= # begin enum ANONYMOUS_17 =#
-typealias ANONYMOUS_17 UInt32
+const  ANONYMOUS_17 = UInt32
 
 const PETSC_VTK_POINT_FIELD = (UInt32)(0)
 const PETSC_VTK_POINT_VECTOR_FIELD = (UInt32)(1)
@@ -1761,7 +1761,7 @@ const PETSC_VTK_CELL_VECTOR_FIELD = (UInt32)(3)
 
 #= # end enum ANONYMOUS_17 =#
 #= # begin enum PetscViewerVTKFieldType =#
-typealias PetscViewerVTKFieldType UInt32
+const  PetscViewerVTKFieldType = UInt32
 
 const PETSC_VTK_POINT_FIELD = (UInt32)(0)
 const PETSC_VTK_POINT_VECTOR_FIELD = (UInt32)(1)
@@ -1769,32 +1769,32 @@ const PETSC_VTK_CELL_FIELD = (UInt32)(2)
 const PETSC_VTK_CELL_VECTOR_FIELD = (UInt32)(3)
 
 #= # end enum PetscViewerVTKFieldType =#
-immutable _n_PetscViewers
+struct _n_PetscViewers
 end
 
-typealias PetscViewers Ptr{_n_PetscViewers}
-typealias PetscBT Symbol
+const  PetscViewers = Ptr{_n_PetscViewers}
+const  PetscBT = Symbol
 
 #= skipping type declaration with undefined symbols:
-immutable _n_PetscTable
+struct _n_PetscTable
     keytable::Ptr{PetscInt}
     table::Ptr{PetscInt}
     count::PetscInt
     tablesize::PetscInt
     head::PetscInt
     maxkey::PetscInt
-end 
+end
 =#
 # skipping undefined typealias typealias PetscTable Ptr{_n_PetscTable}
-typealias PetscTablePosition Ptr{Int64}
+const  PetscTablePosition = Ptr{Int64}
 
-immutable _p_PetscMatlabEngine
+struct _p_PetscMatlabEngine
 end
 
-typealias PetscMatlabEngine Ptr{_p_PetscMatlabEngine}
+const  PetscMatlabEngine = Ptr{_p_PetscMatlabEngine}
 
 #= # begin enum ANONYMOUS_18 =#
-typealias ANONYMOUS_18 UInt32
+const  ANONYMOUS_18 = UInt32
 
 const PETSC_DRAW_MARKER_CROSS = (UInt32)(0)
 const PETSC_DRAW_MARKER_POINT = (UInt32)(1)
@@ -1803,7 +1803,7 @@ const PETSC_DRAW_MARKER_CIRCLE = (UInt32)(3)
 
 #= # end enum ANONYMOUS_18 =#
 #= # begin enum PetscDrawMarkerType =#
-typealias PetscDrawMarkerType UInt32
+const  PetscDrawMarkerType = UInt32
 
 const PETSC_DRAW_MARKER_CROSS = (UInt32)(0)
 const PETSC_DRAW_MARKER_POINT = (UInt32)(1)
@@ -1812,7 +1812,7 @@ const PETSC_DRAW_MARKER_CIRCLE = (UInt32)(3)
 
 #= # end enum PetscDrawMarkerType =#
 #= # begin enum ANONYMOUS_19 =#
-typealias ANONYMOUS_19 UInt32
+const  ANONYMOUS_19 = UInt32
 
 const PETSC_BUTTON_NONE = (UInt32)(0)
 const PETSC_BUTTON_LEFT = (UInt32)(1)
@@ -1824,7 +1824,7 @@ const PETSC_BUTTON_RIGHT_SHIFT = (UInt32)(6)
 
 #= # end enum ANONYMOUS_19 =#
 #= # begin enum PetscDrawButton =#
-typealias PetscDrawButton UInt32
+const  PetscDrawButton = UInt32
 
 const PETSC_BUTTON_NONE = (UInt32)(0)
 const PETSC_BUTTON_LEFT = (UInt32)(1)
@@ -1836,7 +1836,7 @@ const PETSC_BUTTON_RIGHT_SHIFT = (UInt32)(6)
 
 #= # end enum PetscDrawButton =#
 #= skipping type declaration with undefined symbols:
-immutable PetscDrawViewPorts
+struct PetscDrawViewPorts
     nports::PetscInt
     xl::Ptr{PetscReal}
     xr::Ptr{PetscReal}
@@ -1847,42 +1847,42 @@ immutable PetscDrawViewPorts
     port_yl::PetscReal
     port_xr::PetscReal
     port_yr::PetscReal
-end 
+end
 =#
-immutable _p_PetscSF
+struct _p_PetscSF
 end
 
-typealias PetscSF Ptr{_p_PetscSF}
+const  PetscSF = Ptr{_p_PetscSF}
 
 #= skipping type declaration with undefined symbols:
-immutable PetscSFNode
+struct PetscSFNode
     rank::PetscInt
     index::PetscInt
-end 
+end
 =#
-immutable _p_IS
+struct _p_IS
 end
 
-immutable IS{T}
-    pobj::Ptr{Void}
+struct IS{T}
+    pobj::Ptr{Cvoid}
 end
 
-immutable _p_ISLocalToGlobalMapping
+struct _p_ISLocalToGlobalMapping
 end
 
-immutable ISLocalToGlobalMapping{T}
-    pobj::Ptr{Void}
+struct ISLocalToGlobalMapping{T}
+    pobj::Ptr{Cvoid}
 end
 
-immutable _n_ISColoring
+struct _n_ISColoring
 end
 
-immutable ISColoring{T}
-    pobj::Ptr{Void}
+struct ISColoring{T}
+    pobj::Ptr{Cvoid}
 end
 
 #= skipping type declaration with undefined symbols:
-immutable _n_PetscLayout
+struct _n_PetscLayout
     comm::MPI_Comm
     n::PetscInt
     N::PetscInt
@@ -1893,64 +1893,64 @@ immutable _n_PetscLayout
     refcnt::PetscInt
     mapping::ISLocalToGlobalMapping
     trstarts::Ptr{PetscInt}
-end 
+end
 =#
-immutable PetscLayout{T}
-    pobj::Ptr{Void}
+struct PetscLayout{T}
+    pobj::Ptr{Cvoid}
 end
 
-immutable _p_PetscSection
+struct _p_PetscSection
 end
 
-typealias PetscSection Ptr{_p_PetscSection}
-typealias ISType Symbol
+const  PetscSection = Ptr{_p_PetscSection}
+const  ISType = Symbol
 
 #= # begin enum ANONYMOUS_20 =#
-typealias ANONYMOUS_20 UInt32
+const  ANONYMOUS_20 = UInt32
 
 const IS_GTOLM_MASK = (UInt32)(0)
 const IS_GTOLM_DROP = (UInt32)(1)
 
 #= # end enum ANONYMOUS_20 =#
 #= # begin enum ISGlobalToLocalMappingType =#
-typealias ISGlobalToLocalMappingType UInt32
+const  ISGlobalToLocalMappingType = UInt32
 
 const IS_GTOLM_MASK = (UInt32)(0)
 const IS_GTOLM_DROP = (UInt32)(1)
 
 #= # end enum ISGlobalToLocalMappingType =#
 #= # begin enum ANONYMOUS_21 =#
-typealias ANONYMOUS_21 UInt32
+const  ANONYMOUS_21 = UInt32
 
 const IS_COLORING_GLOBAL = (UInt32)(0)
 const IS_COLORING_GHOSTED = (UInt32)(1)
 
 #= # end enum ANONYMOUS_21 =#
 #= # begin enum ISColoringType =#
-typealias ISColoringType UInt32
+const  ISColoringType = UInt32
 
 const IS_COLORING_GLOBAL = (UInt32)(0)
 const IS_COLORING_GHOSTED = (UInt32)(1)
 
 #= # end enum ISColoringType =#
-typealias ISColoringValue UInt16
+const  ISColoringValue = UInt16
 
-immutable _p_Vec
+struct _p_Vec
 end
 
-immutable Vec{T}
-    pobj::Ptr{Void}
+struct Vec{T}
+    pobj::Ptr{Cvoid}
 end
 
-immutable _p_VecScatter
+struct _p_VecScatter
 end
 
-immutable VecScatter{T}
-    pobj::Ptr{Void}
+struct VecScatter{T}
+    pobj::Ptr{Cvoid}
 end
 
 #= # begin enum ANONYMOUS_22 =#
-typealias ANONYMOUS_22 UInt32
+const  ANONYMOUS_22 = UInt32
 
 const SCATTER_FORWARD = (UInt32)(0)
 const SCATTER_REVERSE = (UInt32)(1)
@@ -1960,7 +1960,7 @@ const SCATTER_LOCAL = (UInt32)(2)
 
 #= # end enum ANONYMOUS_22 =#
 #= # begin enum ScatterMode =#
-typealias ScatterMode UInt32
+const  ScatterMode = UInt32
 
 const SCATTER_FORWARD = (UInt32)(0)
 const SCATTER_REVERSE = (UInt32)(1)
@@ -1969,10 +1969,10 @@ const SCATTER_REVERSE_LOCAL = (UInt32)(3)
 const SCATTER_LOCAL = (UInt32)(2)
 
 #= # end enum ScatterMode =#
-typealias VecType Symbol
+const  VecType = Symbol
 
 #= # begin enum ANONYMOUS_23 =#
-typealias ANONYMOUS_23 UInt32
+const  ANONYMOUS_23 = UInt32
 
 const NORM_1 = (UInt32)(0)
 const NORM_2 = (UInt32)(1)
@@ -1982,21 +1982,21 @@ const NORM_1_AND_2 = (UInt32)(4)
 
 #= # end enum ANONYMOUS_23 =#
 #= # begin enum ANONYMOUS_24 =#
-typealias ANONYMOUS_24 UInt32
+const  ANONYMOUS_24 = UInt32
 
 const VEC_IGNORE_OFF_PROC_ENTRIES = (UInt32)(0)
 const VEC_IGNORE_NEGATIVE_INDICES = (UInt32)(1)
 
 #= # end enum ANONYMOUS_24 =#
 #= # begin enum VecOption =#
-typealias VecOption UInt32
+const  VecOption = UInt32
 
 const VEC_IGNORE_OFF_PROC_ENTRIES = (UInt32)(0)
 const VEC_IGNORE_NEGATIVE_INDICES = (UInt32)(1)
 
 #= # end enum VecOption =#
 #= # begin enum ANONYMOUS_25 =#
-typealias ANONYMOUS_25 UInt32
+const  ANONYMOUS_25 = UInt32
 
 const VECOP_VIEW = (UInt32)(33)
 const VECOP_LOAD = (UInt32)(41)
@@ -2004,7 +2004,7 @@ const VECOP_DUPLICATE = (UInt32)(0)
 
 #= # end enum ANONYMOUS_25 =#
 #= # begin enum VecOperation =#
-typealias VecOperation UInt32
+const  VecOperation = UInt32
 
 const VECOP_VIEW = (UInt32)(33)
 const VECOP_LOAD = (UInt32)(41)
@@ -2012,23 +2012,23 @@ const VECOP_DUPLICATE = (UInt32)(0)
 
 #= # end enum VecOperation =#
 #= skipping type declaration with undefined symbols:
-immutable _n_Vecs
+struct _n_Vecs
     n::PetscInt
     v::Vec
-end 
+end
 =#
 # skipping undefined typealias typealias Vecs Ptr{_n_Vecs}
-immutable _p_Mat
+struct _p_Mat
 end
 
-immutable Mat{T}
-    pobj::Ptr{Void}
+struct Mat{T}
+    pobj::Ptr{Cvoid}
 end
 
-typealias MatType Symbol
+const  MatType = Symbol
 
 #= # begin enum ANONYMOUS_26 =#
-typealias ANONYMOUS_26 UInt32
+const  ANONYMOUS_26 = UInt32
 
 const MAT_FACTOR_NONE = (UInt32)(0)
 const MAT_FACTOR_LU = (UInt32)(1)
@@ -2039,7 +2039,7 @@ const MAT_FACTOR_ILUDT = (UInt32)(5)
 
 #= # end enum ANONYMOUS_26 =#
 #= # begin enum MatFactorType =#
-typealias MatFactorType UInt32
+const  MatFactorType = UInt32
 
 const MAT_FACTOR_NONE = (UInt32)(0)
 const MAT_FACTOR_LU = (UInt32)(1)
@@ -2050,7 +2050,7 @@ const MAT_FACTOR_ILUDT = (UInt32)(5)
 
 #= # end enum MatFactorType =#
 #= # begin enum ANONYMOUS_27 =#
-typealias ANONYMOUS_27 UInt32
+const  ANONYMOUS_27 = UInt32
 
 const MAT_INITIAL_MATRIX = (UInt32)(0)
 const MAT_REUSE_MATRIX = (UInt32)(1)
@@ -2058,7 +2058,7 @@ const MAT_IGNORE_MATRIX = (UInt32)(2)
 
 #= # end enum ANONYMOUS_27 =#
 #= # begin enum MatReuse =#
-typealias MatReuse UInt32
+const  MatReuse = UInt32
 
 const MAT_INITIAL_MATRIX = (UInt32)(0)
 const MAT_REUSE_MATRIX = (UInt32)(1)
@@ -2066,21 +2066,21 @@ const MAT_IGNORE_MATRIX = (UInt32)(2)
 
 #= # end enum MatReuse =#
 #= # begin enum ANONYMOUS_28 =#
-typealias ANONYMOUS_28 UInt32
+const  ANONYMOUS_28 = UInt32
 
 const MAT_DO_NOT_GET_VALUES = (UInt32)(0)
 const MAT_GET_VALUES = (UInt32)(1)
 
 #= # end enum ANONYMOUS_28 =#
 #= # begin enum MatGetSubMatrixOption =#
-typealias MatGetSubMatrixOption UInt32
+const  MatGetSubMatrixOption = UInt32
 
 const MAT_DO_NOT_GET_VALUES = (UInt32)(0)
 const MAT_GET_VALUES = (UInt32)(1)
 
 #= # end enum MatGetSubMatrixOption =#
 #= # begin enum ANONYMOUS_29 =#
-typealias ANONYMOUS_29 UInt32
+const  ANONYMOUS_29 = UInt32
 
 const DIFFERENT_NONZERO_PATTERN = (UInt32)(0)
 const SUBSET_NONZERO_PATTERN = (UInt32)(1)
@@ -2088,7 +2088,7 @@ const SAME_NONZERO_PATTERN = (UInt32)(2)
 
 #= # end enum ANONYMOUS_29 =#
 #= # begin enum MatStructure =#
-typealias MatStructure UInt32
+const  MatStructure = UInt32
 
 const DIFFERENT_NONZERO_PATTERN = (UInt32)(0)
 const SUBSET_NONZERO_PATTERN = (UInt32)(1)
@@ -2096,43 +2096,43 @@ const SAME_NONZERO_PATTERN = (UInt32)(2)
 
 #= # end enum MatStructure =#
 #= # begin enum ANONYMOUS_30 =#
-typealias ANONYMOUS_30 UInt32
+const  ANONYMOUS_30 = UInt32
 
 const MAT_COMPOSITE_ADDITIVE = (UInt32)(0)
 const MAT_COMPOSITE_MULTIPLICATIVE = (UInt32)(1)
 
 #= # end enum ANONYMOUS_30 =#
 #= # begin enum MatCompositeType =#
-typealias MatCompositeType UInt32
+const  MatCompositeType = UInt32
 
 const MAT_COMPOSITE_ADDITIVE = (UInt32)(0)
 const MAT_COMPOSITE_MULTIPLICATIVE = (UInt32)(1)
 
 #= # end enum MatCompositeType =#
 #= skipping type declaration with undefined symbols:
-immutable MatStencil
+struct MatStencil
     k::PetscInt
     j::PetscInt
     i::PetscInt
     c::PetscInt
-end 
+end
 =#
 #= # begin enum ANONYMOUS_31 =#
-typealias ANONYMOUS_31 UInt32
+const  ANONYMOUS_31 = UInt32
 
 const MAT_FLUSH_ASSEMBLY = (UInt32)(1)
 const MAT_FINAL_ASSEMBLY = (UInt32)(0)
 
 #= # end enum ANONYMOUS_31 =#
 #= # begin enum MatAssemblyType =#
-typealias MatAssemblyType UInt32
+const  MatAssemblyType = UInt32
 
 const MAT_FLUSH_ASSEMBLY = (UInt32)(1)
 const MAT_FINAL_ASSEMBLY = (UInt32)(0)
 
 #= # end enum MatAssemblyType =#
 #= # begin enum ANONYMOUS_32 =#
-typealias ANONYMOUS_32 Cint
+const  ANONYMOUS_32 = Cint
 
 const MAT_OPTION_MIN = (Int32)(-5)
 const MAT_NEW_NONZERO_LOCATION_ERR = (Int32)(-4)
@@ -2161,7 +2161,7 @@ const MAT_OPTION_MAX = (Int32)(19)
 
 #= # end enum ANONYMOUS_32 =#
 #= # begin enum MatOption =#
-typealias MatOption Cint
+const  MatOption = Cint
 
 const MAT_OPTION_MIN = (Int32)(-5)
 const MAT_NEW_NONZERO_LOCATION_ERR = (Int32)(-4)
@@ -2190,7 +2190,7 @@ const MAT_OPTION_MAX = (Int32)(19)
 
 #= # end enum MatOption =#
 #= # begin enum ANONYMOUS_33 =#
-typealias ANONYMOUS_33 UInt32
+const  ANONYMOUS_33 = UInt32
 
 const MAT_DO_NOT_COPY_VALUES = (UInt32)(0)
 const MAT_COPY_VALUES = (UInt32)(1)
@@ -2198,14 +2198,14 @@ const MAT_SHARE_NONZERO_PATTERN = (UInt32)(2)
 
 #= # end enum ANONYMOUS_33 =#
 #= # begin enum MatDuplicateOption =#
-typealias MatDuplicateOption UInt32
+const  MatDuplicateOption = UInt32
 
 const MAT_DO_NOT_COPY_VALUES = (UInt32)(0)
 const MAT_COPY_VALUES = (UInt32)(1)
 const MAT_SHARE_NONZERO_PATTERN = (UInt32)(2)
 
 #= # end enum MatDuplicateOption =#
-immutable MatInfo
+struct MatInfo
     block_size::PetscLogDouble
     nz_allocated::PetscLogDouble
     nz_used::PetscLogDouble
@@ -2219,7 +2219,7 @@ immutable MatInfo
 end
 
 #= # begin enum ANONYMOUS_34 =#
-typealias ANONYMOUS_34 UInt32
+const  ANONYMOUS_34 = UInt32
 
 const MAT_LOCAL = (UInt32)(1)
 const MAT_GLOBAL_MAX = (UInt32)(2)
@@ -2227,17 +2227,17 @@ const MAT_GLOBAL_SUM = (UInt32)(3)
 
 #= # end enum ANONYMOUS_34 =#
 #= # begin enum MatInfoType =#
-typealias MatInfoType UInt32
+const  MatInfoType = UInt32
 
 const MAT_LOCAL = (UInt32)(1)
 const MAT_GLOBAL_MAX = (UInt32)(2)
 const MAT_GLOBAL_SUM = (UInt32)(3)
 
 #= # end enum MatInfoType =#
-typealias MatOrderingType Symbol
+const  MatOrderingType = Symbol
 
 #= # begin enum ANONYMOUS_35 =#
-typealias ANONYMOUS_35 UInt32
+const  ANONYMOUS_35 = UInt32
 
 const MAT_SHIFT_NONE = (UInt32)(0)
 const MAT_SHIFT_NONZERO = (UInt32)(1)
@@ -2246,7 +2246,7 @@ const MAT_SHIFT_INBLOCKS = (UInt32)(3)
 
 #= # end enum ANONYMOUS_35 =#
 #= # begin enum MatFactorShiftType =#
-typealias MatFactorShiftType UInt32
+const  MatFactorShiftType = UInt32
 
 const MAT_SHIFT_NONE = (UInt32)(0)
 const MAT_SHIFT_NONZERO = (UInt32)(1)
@@ -2255,7 +2255,7 @@ const MAT_SHIFT_INBLOCKS = (UInt32)(3)
 
 #= # end enum MatFactorShiftType =#
 #= skipping type declaration with undefined symbols:
-immutable MatFactorInfo
+struct MatFactorInfo
     diagonal_fill::PetscReal
     usedt::PetscReal
     dt::PetscReal
@@ -2267,10 +2267,10 @@ immutable MatFactorInfo
     zeropivot::PetscReal
     shifttype::PetscReal
     shiftamount::PetscReal
-end 
+end
 =#
 #= # begin enum ANONYMOUS_36 =#
-typealias ANONYMOUS_36 UInt32
+const  ANONYMOUS_36 = UInt32
 
 const SOR_FORWARD_SWEEP = (UInt32)(1)
 const SOR_BACKWARD_SWEEP = (UInt32)(2)
@@ -2285,7 +2285,7 @@ const SOR_APPLY_LOWER = (UInt32)(128)
 
 #= # end enum ANONYMOUS_36 =#
 #= # begin enum MatSORType =#
-typealias MatSORType UInt32
+const  MatSORType = UInt32
 
 const SOR_FORWARD_SWEEP = (UInt32)(1)
 const SOR_BACKWARD_SWEEP = (UInt32)(2)
@@ -2299,14 +2299,14 @@ const SOR_APPLY_UPPER = (UInt32)(64)
 const SOR_APPLY_LOWER = (UInt32)(128)
 
 #= # end enum MatSORType =#
-immutable _p_MatColoring
+struct _p_MatColoring
 end
 
-typealias MatColoring Ptr{_p_MatColoring}
-typealias MatColoringType Symbol
+const  MatColoring = Ptr{_p_MatColoring}
+const  MatColoringType = Symbol
 
 #= # begin enum ANONYMOUS_37 =#
-typealias ANONYMOUS_37 UInt32
+const  ANONYMOUS_37 = UInt32
 
 const MAT_COLORING_WEIGHT_RANDOM = (UInt32)(0)
 const MAT_COLORING_WEIGHT_LEXICAL = (UInt32)(1)
@@ -2315,7 +2315,7 @@ const MAT_COLORING_WEIGHT_SL = (UInt32)(3)
 
 #= # end enum ANONYMOUS_37 =#
 #= # begin enum MatColoringWeightType =#
-typealias MatColoringWeightType UInt32
+const  MatColoringWeightType = UInt32
 
 const MAT_COLORING_WEIGHT_RANDOM = (UInt32)(0)
 const MAT_COLORING_WEIGHT_LEXICAL = (UInt32)(1)
@@ -2323,24 +2323,24 @@ const MAT_COLORING_WEIGHT_LF = (UInt32)(2)
 const MAT_COLORING_WEIGHT_SL = (UInt32)(3)
 
 #= # end enum MatColoringWeightType =#
-immutable _p_MatFDColoring
+struct _p_MatFDColoring
 end
 
-typealias MatFDColoring Ptr{_p_MatFDColoring}
+const  MatFDColoring = Ptr{_p_MatFDColoring}
 
-immutable _p_MatTransposeColoring
+struct _p_MatTransposeColoring
 end
 
-typealias MatTransposeColoring Ptr{_p_MatTransposeColoring}
+const  MatTransposeColoring = Ptr{_p_MatTransposeColoring}
 
-immutable _p_MatPartitioning
+struct _p_MatPartitioning
 end
 
-typealias MatPartitioning Ptr{_p_MatPartitioning}
-typealias MatPartitioningType Symbol
+const  MatPartitioning = Ptr{_p_MatPartitioning}
+const  MatPartitioningType = Symbol
 
 #= # begin enum ANONYMOUS_38 =#
-typealias ANONYMOUS_38 UInt32
+const  ANONYMOUS_38 = UInt32
 
 const MP_CHACO_MULTILEVEL = (UInt32)(1)
 const MP_CHACO_SPECTRAL = (UInt32)(2)
@@ -2350,7 +2350,7 @@ const MP_CHACO_SCATTERED = (UInt32)(6)
 
 #= # end enum ANONYMOUS_38 =#
 #= # begin enum MPChacoGlobalType =#
-typealias MPChacoGlobalType UInt32
+const  MPChacoGlobalType = UInt32
 
 const MP_CHACO_MULTILEVEL = (UInt32)(1)
 const MP_CHACO_SPECTRAL = (UInt32)(2)
@@ -2360,35 +2360,35 @@ const MP_CHACO_SCATTERED = (UInt32)(6)
 
 #= # end enum MPChacoGlobalType =#
 #= # begin enum ANONYMOUS_39 =#
-typealias ANONYMOUS_39 UInt32
+const  ANONYMOUS_39 = UInt32
 
 const MP_CHACO_KERNIGHAN = (UInt32)(1)
 const MP_CHACO_NONE = (UInt32)(2)
 
 #= # end enum ANONYMOUS_39 =#
 #= # begin enum MPChacoLocalType =#
-typealias MPChacoLocalType UInt32
+const  MPChacoLocalType = UInt32
 
 const MP_CHACO_KERNIGHAN = (UInt32)(1)
 const MP_CHACO_NONE = (UInt32)(2)
 
 #= # end enum MPChacoLocalType =#
 #= # begin enum ANONYMOUS_40 =#
-typealias ANONYMOUS_40 UInt32
+const  ANONYMOUS_40 = UInt32
 
 const MP_CHACO_LANCZOS = (UInt32)(0)
 const MP_CHACO_RQI = (UInt32)(1)
 
 #= # end enum ANONYMOUS_40 =#
 #= # begin enum MPChacoEigenType =#
-typealias MPChacoEigenType UInt32
+const  MPChacoEigenType = UInt32
 
 const MP_CHACO_LANCZOS = (UInt32)(0)
 const MP_CHACO_RQI = (UInt32)(1)
 
 #= # end enum MPChacoEigenType =#
 #= # begin enum ANONYMOUS_41 =#
-typealias ANONYMOUS_41 UInt32
+const  ANONYMOUS_41 = UInt32
 
 const MP_PTSCOTCH_QUALITY = (UInt32)(0)
 const MP_PTSCOTCH_SPEED = (UInt32)(1)
@@ -2398,7 +2398,7 @@ const MP_PTSCOTCH_SCALABILITY = (UInt32)(4)
 
 #= # end enum ANONYMOUS_41 =#
 #= # begin enum MPPTScotchStrategyType =#
-typealias MPPTScotchStrategyType UInt32
+const  MPPTScotchStrategyType = UInt32
 
 const MP_PTSCOTCH_QUALITY = (UInt32)(0)
 const MP_PTSCOTCH_SPEED = (UInt32)(1)
@@ -2407,38 +2407,38 @@ const MP_PTSCOTCH_SAFETY = (UInt32)(3)
 const MP_PTSCOTCH_SCALABILITY = (UInt32)(4)
 
 #= # end enum MPPTScotchStrategyType =#
-immutable _p_MatCoarsen
+struct _p_MatCoarsen
 end
 
-typealias MatCoarsen Ptr{_p_MatCoarsen}
-typealias MatCoarsenType Symbol
+const  MatCoarsen = Ptr{_p_MatCoarsen}
+const  MatCoarsenType = Symbol
 
 #= skipping type declaration with undefined symbols:
-immutable _PetscCDIntNd
+struct _PetscCDIntNd
     next::Ptr{_PetscCDIntNd}
     gid::PetscInt
-end 
+end
 =#
 #= skipping type declaration with undefined symbols:
-immutable PetscCDIntNd
+struct PetscCDIntNd
     next::Ptr{_PetscCDIntNd}
     gid::PetscInt
-end 
+end
 =#
 #= skipping type declaration with undefined symbols:
-immutable _PetscCDArrNd
+struct _PetscCDArrNd
     next::Ptr{_PetscCDArrNd}
     array::Ptr{_PetscCDIntNd}
-end 
+end
 =#
 #= skipping type declaration with undefined symbols:
-immutable PetscCDArrNd
+struct PetscCDArrNd
     next::Ptr{_PetscCDArrNd}
     array::Ptr{_PetscCDIntNd}
-end 
+end
 =#
 #= skipping type declaration with undefined symbols:
-immutable _PetscCoarsenData
+struct _PetscCoarsenData
     pool_list::PetscCDArrNd
     new_node::Ptr{PetscCDIntNd}
     new_left::PetscInt
@@ -2447,10 +2447,10 @@ immutable _PetscCoarsenData
     array::Ptr{Ptr{PetscCDIntNd}}
     size::PetscInt
     mat::Mat
-end 
+end
 =#
 #= skipping type declaration with undefined symbols:
-immutable PetscCoarsenData
+struct PetscCoarsenData
     pool_list::PetscCDArrNd
     new_node::Ptr{PetscCDIntNd}
     new_left::PetscInt
@@ -2459,10 +2459,10 @@ immutable PetscCoarsenData
     array::Ptr{Ptr{PetscCDIntNd}}
     size::PetscInt
     mat::Mat
-end 
+end
 =#
 #= # begin enum ANONYMOUS_42 =#
-typealias ANONYMOUS_42 UInt32
+const  ANONYMOUS_42 = UInt32
 
 const MATOP_SET_VALUES = (UInt32)(0)
 const MATOP_GET_ROW = (UInt32)(1)
@@ -2602,7 +2602,7 @@ const MATOP_MPICONCATENATESEQ = (UInt32)(144)
 
 #= # end enum ANONYMOUS_42 =#
 #= # begin enum MatOperation =#
-typealias MatOperation UInt32
+const  MatOperation = UInt32
 
 const MATOP_SET_VALUES = (UInt32)(0)
 const MATOP_GET_ROW = (UInt32)(1)
@@ -2741,24 +2741,24 @@ const MATOP_FDCOLORING_SETUP = (UInt32)(142)
 const MATOP_MPICONCATENATESEQ = (UInt32)(144)
 
 #= # end enum MatOperation =#
-immutable _p_MatNullSpace
+struct _p_MatNullSpace
 end
 
-typealias MatNullSpace Ptr{_p_MatNullSpace}
+const  MatNullSpace = Ptr{_p_MatNullSpace}
 
-immutable _p_MatMFFD
+struct _p_MatMFFD
 end
 
-typealias MatMFFD Ptr{_p_MatMFFD}
-typealias MatMFFDType Symbol
+const  MatMFFD = Ptr{_p_MatMFFD}
+const  MatMFFDType = Symbol
 
-immutable _p_DM
+struct _p_DM
 end
 
-typealias DM Ptr{_p_DM}
+const  DM = Ptr{_p_DM}
 
 #= # begin enum ANONYMOUS_43 =#
-typealias ANONYMOUS_43 UInt32
+const  ANONYMOUS_43 = UInt32
 
 const DM_BOUNDARY_NONE = (UInt32)(0)
 const DM_BOUNDARY_GHOSTED = (UInt32)(1)
@@ -2768,7 +2768,7 @@ const DM_BOUNDARY_TWIST = (UInt32)(4)
 
 #= # end enum ANONYMOUS_43 =#
 #= # begin enum DMBoundaryType =#
-typealias DMBoundaryType UInt32
+const  DMBoundaryType = UInt32
 
 const DM_BOUNDARY_NONE = (UInt32)(0)
 const DM_BOUNDARY_GHOSTED = (UInt32)(1)
@@ -2777,39 +2777,39 @@ const DM_BOUNDARY_PERIODIC = (UInt32)(3)
 const DM_BOUNDARY_TWIST = (UInt32)(4)
 
 #= # end enum DMBoundaryType =#
-immutable _p_PetscPartitioner
+struct _p_PetscPartitioner
 end
 
-typealias PetscPartitioner Ptr{_p_PetscPartitioner}
+const  PetscPartitioner = Ptr{_p_PetscPartitioner}
 
-immutable _p_PetscSpace
+struct _p_PetscSpace
 end
 
-typealias PetscSpace Ptr{_p_PetscSpace}
+const  PetscSpace = Ptr{_p_PetscSpace}
 
-immutable _p_PetscDualSpace
+struct _p_PetscDualSpace
 end
 
-typealias PetscDualSpace Ptr{_p_PetscDualSpace}
+const  PetscDualSpace = Ptr{_p_PetscDualSpace}
 
-immutable _p_PetscFE
+struct _p_PetscFE
 end
 
-typealias PetscFE Ptr{_p_PetscFE}
+const  PetscFE = Ptr{_p_PetscFE}
 
-immutable _p_PetscDS
+struct _p_PetscDS
 end
 
-typealias PetscDS Ptr{_p_PetscDS}
-typealias DMType Symbol
+const  PetscDS = Ptr{_p_PetscDS}
+const  DMType = Symbol
 
-immutable NLF_DAAD
+struct NLF_DAAD
 end
 
-typealias NLF Ptr{NLF_DAAD}
+const  NLF = Ptr{NLF_DAAD}
 
 #= # begin enum ANONYMOUS_44 =#
-typealias ANONYMOUS_44 UInt32
+const  ANONYMOUS_44 = UInt32
 
 const PETSC_UNIT_LENGTH = (UInt32)(0)
 const PETSC_UNIT_MASS = (UInt32)(1)
@@ -2822,7 +2822,7 @@ const NUM_PETSC_UNITS = (UInt32)(7)
 
 #= # end enum ANONYMOUS_44 =#
 #= # begin enum PetscUnit =#
-typealias PetscUnit UInt32
+const  PetscUnit = UInt32
 
 const PETSC_UNIT_LENGTH = (UInt32)(0)
 const PETSC_UNIT_MASS = (UInt32)(1)
@@ -2835,7 +2835,7 @@ const NUM_PETSC_UNITS = (UInt32)(7)
 
 #= # end enum PetscUnit =#
 #= skipping type declaration with undefined symbols:
-immutable _DMInterpolationInfo
+struct _DMInterpolationInfo
     comm::MPI_Comm
     dim::PetscInt
     nInput::PetscInt
@@ -2844,53 +2844,53 @@ immutable _DMInterpolationInfo
     n::PetscInt
     coords::Vec
     dof::PetscInt
-end 
+end
 =#
 # skipping undefined typealias typealias DMInterpolationInfo Ptr{_DMInterpolationInfo}
 #= # begin enum ANONYMOUS_45 =#
-typealias ANONYMOUS_45 UInt32
+const  ANONYMOUS_45 = UInt32
 
 const DMDA_STENCIL_STAR = (UInt32)(0)
 const DMDA_STENCIL_BOX = (UInt32)(1)
 
 #= # end enum ANONYMOUS_45 =#
 #= # begin enum DMDAStencilType =#
-typealias DMDAStencilType UInt32
+const  DMDAStencilType = UInt32
 
 const DMDA_STENCIL_STAR = (UInt32)(0)
 const DMDA_STENCIL_BOX = (UInt32)(1)
 
 #= # end enum DMDAStencilType =#
 #= # begin enum ANONYMOUS_46 =#
-typealias ANONYMOUS_46 UInt32
+const  ANONYMOUS_46 = UInt32
 
 const DMDA_Q0 = (UInt32)(0)
 const DMDA_Q1 = (UInt32)(1)
 
 #= # end enum ANONYMOUS_46 =#
 #= # begin enum DMDAInterpolationType =#
-typealias DMDAInterpolationType UInt32
+const  DMDAInterpolationType = UInt32
 
 const DMDA_Q0 = (UInt32)(0)
 const DMDA_Q1 = (UInt32)(1)
 
 #= # end enum DMDAInterpolationType =#
 #= # begin enum ANONYMOUS_47 =#
-typealias ANONYMOUS_47 UInt32
+const  ANONYMOUS_47 = UInt32
 
 const DMDA_ELEMENT_P1 = (UInt32)(0)
 const DMDA_ELEMENT_Q1 = (UInt32)(1)
 
 #= # end enum ANONYMOUS_47 =#
 #= # begin enum DMDAElementType =#
-typealias DMDAElementType UInt32
+const  DMDAElementType = UInt32
 
 const DMDA_ELEMENT_P1 = (UInt32)(0)
 const DMDA_ELEMENT_Q1 = (UInt32)(1)
 
 #= # end enum DMDAElementType =#
 #= skipping type declaration with undefined symbols:
-immutable DMDALocalInfo
+struct DMDALocalInfo
     dim::PetscInt
     dof::PetscInt
     sw::PetscInt
@@ -2914,41 +2914,41 @@ immutable DMDALocalInfo
     bz::DMBoundaryType
     st::DMDAStencilType
     da::DM
-end 
+end
 =#
-typealias PFType Symbol
+const  PFType = Symbol
 
-immutable _p_PF
+struct _p_PF
 end
 
-typealias PF Ptr{_p_PF}
+const  PF = Ptr{_p_PF}
 
-immutable _p_AO
+struct _p_AO
 end
 
-immutable AO{T}
-    pobj::Ptr{Void}
+struct AO{T}
+    pobj::Ptr{Cvoid}
 end
 
-typealias AOType Symbol
+const  AOType = Symbol
 
-immutable _p_PetscQuadrature
+struct _p_PetscQuadrature
 end
 
-typealias PetscQuadrature Ptr{_p_PetscQuadrature}
+const  PetscQuadrature = Ptr{_p_PetscQuadrature}
 
 #= skipping type declaration with undefined symbols:
-immutable Array_3_PetscReal
+struct Array_3_PetscReal
     d1::PetscReal
     d2::PetscReal
     d3::PetscReal
-end 
+end
 =#
 #= skipping undefined expression zero(::Type{Array_3_PetscReal}) = begin  # /home/jared/.julia/v0.4/Clang/src/wrap_c.jl, line 266:
         Array_3_PetscReal(fill(zero(Float64),3)...)
     end =#
 #= skipping type declaration with undefined symbols:
-immutable Array_9_PetscReal
+struct Array_9_PetscReal
     d1::PetscReal
     d2::PetscReal
     d3::PetscReal
@@ -2958,13 +2958,13 @@ immutable Array_9_PetscReal
     d7::PetscReal
     d8::PetscReal
     d9::PetscReal
-end 
+end
 =#
 #= skipping undefined expression zero(::Type{Array_9_PetscReal}) = begin  # /home/jared/.julia/v0.4/Clang/src/wrap_c.jl, line 266:
         Array_9_PetscReal(fill(zero(Float64),9)...)
     end =#
 #= skipping type declaration with undefined symbols:
-immutable PetscFECellGeom
+struct PetscFECellGeom
     v0::Array_3_PetscReal
     J::Array_9_PetscReal
     invJ::Array_9_PetscReal
@@ -2972,14 +2972,14 @@ immutable PetscFECellGeom
     n::Array_3_PetscReal
     dim::PetscInt
     dimEmbed::PetscInt
-end 
+end
 =#
-typealias PetscSpaceType Symbol
-typealias PetscDualSpaceType Symbol
-typealias PetscFEType Symbol
+const  PetscSpaceType = Symbol
+const  PetscDualSpaceType = Symbol
+const  PetscFEType = Symbol
 
 #= # begin enum ANONYMOUS_48 =#
-typealias ANONYMOUS_48 UInt32
+const  ANONYMOUS_48 = UInt32
 
 const DMDA_X = (UInt32)(0)
 const DMDA_Y = (UInt32)(1)
@@ -2987,7 +2987,7 @@ const DMDA_Z = (UInt32)(2)
 
 #= # end enum ANONYMOUS_48 =#
 #= # begin enum DMDADirection =#
-typealias DMDADirection UInt32
+const  DMDADirection = UInt32
 
 const DMDA_X = (UInt32)(0)
 const DMDA_Y = (UInt32)(1)
@@ -2995,105 +2995,105 @@ const DMDA_Z = (UInt32)(2)
 
 #= # end enum DMDADirection =#
 #= skipping type declaration with undefined symbols:
-immutable DMDACoor2d
+struct DMDACoor2d
     x::PetscScalar
     y::PetscScalar
-end 
+end
 =#
 #= skipping type declaration with undefined symbols:
-immutable DMDACoor3d
+struct DMDACoor3d
     x::PetscScalar
     y::PetscScalar
     z::PetscScalar
-end 
+end
 =#
-immutable _p_PetscLimiter
+struct _p_PetscLimiter
 end
 
-typealias PetscLimiter Ptr{_p_PetscLimiter}
+const  PetscLimiter = Ptr{_p_PetscLimiter}
 
-immutable _p_PetscFV
+struct _p_PetscFV
 end
 
-typealias PetscFV Ptr{_p_PetscFV}
+const  PetscFV = Ptr{_p_PetscFV}
 
 #= skipping type declaration with undefined symbols:
-immutable Array_3_PetscScalar
+struct Array_3_PetscScalar
     d1::PetscScalar
     d2::PetscScalar
     d3::PetscScalar
-end 
+end
 =#
 #= skipping undefined expression zero(::Type{Array_3_PetscScalar}) = begin  # /home/jared/.julia/v0.4/Clang/src/wrap_c.jl, line 266:
         Array_3_PetscScalar(fill(zero(Float64),3)...)
     end =#
 #= skipping type declaration with undefined symbols:
-immutable Array_2_Array_3_PetscScalar
+struct Array_2_Array_3_PetscScalar
     d1::Array_3_PetscScalar
     d2::Array_3_PetscScalar
-end 
+end
 =#
 #= skipping undefined expression zero(::Type{Array_2_Array_3_PetscScalar}) = begin  # /home/jared/.julia/v0.4/Clang/src/wrap_c.jl, line 266:
         Array_2_Array_3_PetscScalar(fill(zero(Array_3_PetscScalar),2)...)
     end =#
 #= skipping type declaration with undefined symbols:
-immutable PetscFVFaceGeom
+struct PetscFVFaceGeom
     normal::Array_3_PetscReal
     centroid::Array_3_PetscReal
     grad::Array_2_Array_3_PetscScalar
-end 
+end
 =#
 #= skipping type declaration with undefined symbols:
-immutable PetscFVCellGeom
+struct PetscFVCellGeom
     centroid::Array_3_PetscReal
     volume::PetscReal
-end 
+end
 =#
-typealias PetscLimiterType Symbol
-typealias PetscFVType Symbol
-typealias PetscPartitionerType Symbol
+const  PetscLimiterType = Symbol
+const  PetscFVType = Symbol
+const  PetscPartitionerType = Symbol
 
-immutable _n_DMLabel
+struct _n_DMLabel
 end
 
-typealias DMLabel Ptr{_n_DMLabel}
+const  DMLabel = Ptr{_n_DMLabel}
 
-immutable _n_Boundary
+struct _n_Boundary
 end
 
-typealias DMBoundary Ptr{_n_Boundary}
+const  DMBoundary = Ptr{_n_Boundary}
 
-immutable JacActionCtx
+struct JacActionCtx
     dm::DM
     u::Vec
     J::Mat
-    user::Ptr{Void}
+    user::Ptr{Cvoid}
 end
 
-typealias PetscDSType Symbol
-typealias PetscPointFunc Ptr{Void}
-typealias PetscPointJac Ptr{Void}
-typealias PetscBdPointFunc Ptr{Void}
-typealias PetscBdPointJac Ptr{Void}
-typealias PetscRiemannFunc Ptr{Void}
+const  PetscDSType = Symbol
+const  PetscPointFunc = Ptr{Cvoid}
+const  PetscPointJac = Ptr{Cvoid}
+const  PetscBdPointFunc = Ptr{Cvoid}
+const  PetscBdPointJac = Ptr{Cvoid}
+const  PetscRiemannFunc = Ptr{Cvoid}
 
-immutable _p_Characteristic
+struct _p_Characteristic
 end
 
-typealias Characteristic Ptr{_p_Characteristic}
-typealias CharacteristicType Symbol
+const  Characteristic = Ptr{_p_Characteristic}
+const  CharacteristicType = Symbol
 
-immutable _p_PC
+struct _p_PC
 end
 
-immutable PC{T}
-    pobj::Ptr{Void}
+struct PC{T}
+    pobj::Ptr{Cvoid}
 end
 
-typealias PCType Symbol
+const  PCType = Symbol
 
 #= # begin enum ANONYMOUS_49 =#
-typealias ANONYMOUS_49 Cint
+const  ANONYMOUS_49 = Cint
 
 const PC_SIDE_DEFAULT = (Int32)(-1)
 const PC_LEFT = (Int32)(0)
@@ -3102,7 +3102,7 @@ const PC_SYMMETRIC = (Int32)(2)
 
 #= # end enum ANONYMOUS_49 =#
 #= # begin enum ANONYMOUS_50 =#
-typealias ANONYMOUS_50 Cint
+const  ANONYMOUS_50 = Cint
 
 const PCRICHARDSON_CONVERGED_RTOL = (Int32)(2)
 const PCRICHARDSON_CONVERGED_ATOL = (Int32)(3)
@@ -3111,7 +3111,7 @@ const PCRICHARDSON_DIVERGED_DTOL = (Int32)(-4)
 
 #= # end enum ANONYMOUS_50 =#
 #= # begin enum PCRichardsonConvergedReason =#
-typealias PCRichardsonConvergedReason Cint
+const  PCRichardsonConvergedReason = Cint
 
 const PCRICHARDSON_CONVERGED_RTOL = (Int32)(2)
 const PCRICHARDSON_CONVERGED_ATOL = (Int32)(3)
@@ -3120,7 +3120,7 @@ const PCRICHARDSON_DIVERGED_DTOL = (Int32)(-4)
 
 #= # end enum PCRichardsonConvergedReason =#
 #= # begin enum ANONYMOUS_51 =#
-typealias ANONYMOUS_51 UInt32
+const  ANONYMOUS_51 = UInt32
 
 const PC_JACOBI_DIAGONAL = (UInt32)(0)
 const PC_JACOBI_ROWMAX = (UInt32)(1)
@@ -3128,7 +3128,7 @@ const PC_JACOBI_ROWSUM = (UInt32)(2)
 
 #= # end enum ANONYMOUS_51 =#
 #= # begin enum PCJacobiType =#
-typealias PCJacobiType UInt32
+const  PCJacobiType = UInt32
 
 const PC_JACOBI_DIAGONAL = (UInt32)(0)
 const PC_JACOBI_ROWMAX = (UInt32)(1)
@@ -3136,7 +3136,7 @@ const PC_JACOBI_ROWSUM = (UInt32)(2)
 
 #= # end enum PCJacobiType =#
 #= # begin enum ANONYMOUS_52 =#
-typealias ANONYMOUS_52 UInt32
+const  ANONYMOUS_52 = UInt32
 
 const PC_ASM_BASIC = (UInt32)(3)
 const PC_ASM_RESTRICT = (UInt32)(1)
@@ -3145,7 +3145,7 @@ const PC_ASM_NONE = (UInt32)(0)
 
 #= # end enum ANONYMOUS_52 =#
 #= # begin enum PCASMType =#
-typealias PCASMType UInt32
+const  PCASMType = UInt32
 
 const PC_ASM_BASIC = (UInt32)(3)
 const PC_ASM_RESTRICT = (UInt32)(1)
@@ -3154,7 +3154,7 @@ const PC_ASM_NONE = (UInt32)(0)
 
 #= # end enum PCASMType =#
 #= # begin enum ANONYMOUS_53 =#
-typealias ANONYMOUS_53 UInt32
+const  ANONYMOUS_53 = UInt32
 
 const PC_GASM_BASIC = (UInt32)(3)
 const PC_GASM_RESTRICT = (UInt32)(1)
@@ -3163,7 +3163,7 @@ const PC_GASM_NONE = (UInt32)(0)
 
 #= # end enum ANONYMOUS_53 =#
 #= # begin enum PCGASMType =#
-typealias PCGASMType UInt32
+const  PCGASMType = UInt32
 
 const PC_GASM_BASIC = (UInt32)(3)
 const PC_GASM_RESTRICT = (UInt32)(1)
@@ -3172,7 +3172,7 @@ const PC_GASM_NONE = (UInt32)(0)
 
 #= # end enum PCGASMType =#
 #= # begin enum ANONYMOUS_54 =#
-typealias ANONYMOUS_54 UInt32
+const  ANONYMOUS_54 = UInt32
 
 const PC_COMPOSITE_ADDITIVE = (UInt32)(0)
 const PC_COMPOSITE_MULTIPLICATIVE = (UInt32)(1)
@@ -3182,7 +3182,7 @@ const PC_COMPOSITE_SCHUR = (UInt32)(4)
 
 #= # end enum ANONYMOUS_54 =#
 #= # begin enum PCCompositeType =#
-typealias PCCompositeType UInt32
+const  PCCompositeType = UInt32
 
 const PC_COMPOSITE_ADDITIVE = (UInt32)(0)
 const PC_COMPOSITE_MULTIPLICATIVE = (UInt32)(1)
@@ -3192,7 +3192,7 @@ const PC_COMPOSITE_SCHUR = (UInt32)(4)
 
 #= # end enum PCCompositeType =#
 #= # begin enum ANONYMOUS_55 =#
-typealias ANONYMOUS_55 UInt32
+const  ANONYMOUS_55 = UInt32
 
 const PC_FIELDSPLIT_SCHUR_PRE_SELF = (UInt32)(0)
 const PC_FIELDSPLIT_SCHUR_PRE_SELFP = (UInt32)(1)
@@ -3202,7 +3202,7 @@ const PC_FIELDSPLIT_SCHUR_PRE_FULL = (UInt32)(4)
 
 #= # end enum ANONYMOUS_55 =#
 #= # begin enum PCFieldSplitSchurPreType =#
-typealias PCFieldSplitSchurPreType UInt32
+const  PCFieldSplitSchurPreType = UInt32
 
 const PC_FIELDSPLIT_SCHUR_PRE_SELF = (UInt32)(0)
 const PC_FIELDSPLIT_SCHUR_PRE_SELFP = (UInt32)(1)
@@ -3212,7 +3212,7 @@ const PC_FIELDSPLIT_SCHUR_PRE_FULL = (UInt32)(4)
 
 #= # end enum PCFieldSplitSchurPreType =#
 #= # begin enum ANONYMOUS_56 =#
-typealias ANONYMOUS_56 UInt32
+const  ANONYMOUS_56 = UInt32
 
 const PC_FIELDSPLIT_SCHUR_FACT_DIAG = (UInt32)(0)
 const PC_FIELDSPLIT_SCHUR_FACT_LOWER = (UInt32)(1)
@@ -3221,7 +3221,7 @@ const PC_FIELDSPLIT_SCHUR_FACT_FULL = (UInt32)(3)
 
 #= # end enum ANONYMOUS_56 =#
 #= # begin enum PCFieldSplitSchurFactType =#
-typealias PCFieldSplitSchurFactType UInt32
+const  PCFieldSplitSchurFactType = UInt32
 
 const PC_FIELDSPLIT_SCHUR_FACT_DIAG = (UInt32)(0)
 const PC_FIELDSPLIT_SCHUR_FACT_LOWER = (UInt32)(1)
@@ -3230,7 +3230,7 @@ const PC_FIELDSPLIT_SCHUR_FACT_FULL = (UInt32)(3)
 
 #= # end enum PCFieldSplitSchurFactType =#
 #= # begin enum ANONYMOUS_57 =#
-typealias ANONYMOUS_57 UInt32
+const  ANONYMOUS_57 = UInt32
 
 const PC_PARMS_GLOBAL_RAS = (UInt32)(0)
 const PC_PARMS_GLOBAL_SCHUR = (UInt32)(1)
@@ -3238,7 +3238,7 @@ const PC_PARMS_GLOBAL_BJ = (UInt32)(2)
 
 #= # end enum ANONYMOUS_57 =#
 #= # begin enum PCPARMSGlobalType =#
-typealias PCPARMSGlobalType UInt32
+const  PCPARMSGlobalType = UInt32
 
 const PC_PARMS_GLOBAL_RAS = (UInt32)(0)
 const PC_PARMS_GLOBAL_SCHUR = (UInt32)(1)
@@ -3246,7 +3246,7 @@ const PC_PARMS_GLOBAL_BJ = (UInt32)(2)
 
 #= # end enum PCPARMSGlobalType =#
 #= # begin enum ANONYMOUS_58 =#
-typealias ANONYMOUS_58 UInt32
+const  ANONYMOUS_58 = UInt32
 
 const PC_PARMS_LOCAL_ILU0 = (UInt32)(0)
 const PC_PARMS_LOCAL_ILUK = (UInt32)(1)
@@ -3255,7 +3255,7 @@ const PC_PARMS_LOCAL_ARMS = (UInt32)(3)
 
 #= # end enum ANONYMOUS_58 =#
 #= # begin enum PCPARMSLocalType =#
-typealias PCPARMSLocalType UInt32
+const  PCPARMSLocalType = UInt32
 
 const PC_PARMS_LOCAL_ILU0 = (UInt32)(0)
 const PC_PARMS_LOCAL_ILUK = (UInt32)(1)
@@ -3263,11 +3263,11 @@ const PC_PARMS_LOCAL_ILUT = (UInt32)(2)
 const PC_PARMS_LOCAL_ARMS = (UInt32)(3)
 
 #= # end enum PCPARMSLocalType =#
-typealias PCGAMGType Symbol
-typealias PCGAMGClassicalType Symbol
+const  PCGAMGType = Symbol
+const  PCGAMGClassicalType = Symbol
 
 #= # begin enum ANONYMOUS_59 =#
-typealias ANONYMOUS_59 UInt32
+const  ANONYMOUS_59 = UInt32
 
 const PC_MG_MULTIPLICATIVE = (UInt32)(0)
 const PC_MG_ADDITIVE = (UInt32)(1)
@@ -3276,58 +3276,58 @@ const PC_MG_KASKADE = (UInt32)(3)
 
 #= # end enum ANONYMOUS_59 =#
 #= # begin enum ANONYMOUS_60 =#
-typealias ANONYMOUS_60 UInt32
+const  ANONYMOUS_60 = UInt32
 
 const PC_MG_CYCLE_V = (UInt32)(1)
 const PC_MG_CYCLE_W = (UInt32)(2)
 
 #= # end enum ANONYMOUS_60 =#
 #= # begin enum PCMGCycleType =#
-typealias PCMGCycleType UInt32
+const  PCMGCycleType = UInt32
 
 const PC_MG_CYCLE_V = (UInt32)(1)
 const PC_MG_CYCLE_W = (UInt32)(2)
 
 #= # end enum PCMGCycleType =#
 #= # begin enum ANONYMOUS_61 =#
-typealias ANONYMOUS_61 UInt32
+const  ANONYMOUS_61 = UInt32
 
 const PC_EXOTIC_FACE = (UInt32)(0)
 const PC_EXOTIC_WIREBASKET = (UInt32)(1)
 
 #= # end enum ANONYMOUS_61 =#
 #= # begin enum PCExoticType =#
-typealias PCExoticType UInt32
+const  PCExoticType = UInt32
 
 const PC_EXOTIC_FACE = (UInt32)(0)
 const PC_EXOTIC_WIREBASKET = (UInt32)(1)
 
 #= # end enum PCExoticType =#
-immutable _p_KSP
+struct _p_KSP
 end
 
-immutable KSP{T}
-    pobj::Ptr{Void}
+struct KSP{T}
+    pobj::Ptr{Cvoid}
 end
 
-typealias KSPType Symbol
+const  KSPType = Symbol
 
 #= # begin enum ANONYMOUS_62 =#
-typealias ANONYMOUS_62 UInt32
+const  ANONYMOUS_62 = UInt32
 
 const KSP_FCG_TRUNC_TYPE_STANDARD = (UInt32)(0)
 const KSP_FCG_TRUNC_TYPE_NOTAY = (UInt32)(1)
 
 #= # end enum ANONYMOUS_62 =#
 #= # begin enum KSPFCGTruncationType =#
-typealias KSPFCGTruncationType UInt32
+const  KSPFCGTruncationType = UInt32
 
 const KSP_FCG_TRUNC_TYPE_STANDARD = (UInt32)(0)
 const KSP_FCG_TRUNC_TYPE_NOTAY = (UInt32)(1)
 
 #= # end enum KSPFCGTruncationType =#
 #= # begin enum ANONYMOUS_63 =#
-typealias ANONYMOUS_63 UInt32
+const  ANONYMOUS_63 = UInt32
 
 const KSP_GMRES_CGS_REFINE_NEVER = (UInt32)(0)
 const KSP_GMRES_CGS_REFINE_IFNEEDED = (UInt32)(1)
@@ -3335,7 +3335,7 @@ const KSP_GMRES_CGS_REFINE_ALWAYS = (UInt32)(2)
 
 #= # end enum ANONYMOUS_63 =#
 #= # begin enum KSPGMRESCGSRefinementType =#
-typealias KSPGMRESCGSRefinementType UInt32
+const  KSPGMRESCGSRefinementType = UInt32
 
 const KSP_GMRES_CGS_REFINE_NEVER = (UInt32)(0)
 const KSP_GMRES_CGS_REFINE_IFNEEDED = (UInt32)(1)
@@ -3343,7 +3343,7 @@ const KSP_GMRES_CGS_REFINE_ALWAYS = (UInt32)(2)
 
 #= # end enum KSPGMRESCGSRefinementType =#
 #= # begin enum ANONYMOUS_64 =#
-typealias ANONYMOUS_64 Cint
+const  ANONYMOUS_64 = Cint
 
 const KSP_NORM_DEFAULT = (Int32)(-1)
 const KSP_NORM_NONE = (Int32)(0)
@@ -3353,7 +3353,7 @@ const KSP_NORM_NATURAL = (Int32)(3)
 
 #= # end enum ANONYMOUS_64 =#
 #= # begin enum ANONYMOUS_65 =#
-typealias ANONYMOUS_65 Cint
+const  ANONYMOUS_65 = Cint
 
 const KSP_CONVERGED_RTOL_NORMAL = (Int32)(1)
 const KSP_CONVERGED_ATOL_NORMAL = (Int32)(9)
@@ -3378,7 +3378,7 @@ const KSP_CONVERGED_ITERATING = (Int32)(0)
 
 #= # end enum ANONYMOUS_65 =#
 #= # begin enum KSPConvergedReason =#
-typealias KSPConvergedReason Cint
+const  KSPConvergedReason = Cint
 
 const KSP_CONVERGED_RTOL_NORMAL = (Int32)(1)
 const KSP_CONVERGED_ATOL_NORMAL = (Int32)(9)
@@ -3403,21 +3403,21 @@ const KSP_CONVERGED_ITERATING = (Int32)(0)
 
 #= # end enum KSPConvergedReason =#
 #= # begin enum ANONYMOUS_66 =#
-typealias ANONYMOUS_66 UInt32
+const  ANONYMOUS_66 = UInt32
 
 const KSP_CG_SYMMETRIC = (UInt32)(0)
 const KSP_CG_HERMITIAN = (UInt32)(1)
 
 #= # end enum ANONYMOUS_66 =#
 #= # begin enum KSPCGType =#
-typealias KSPCGType UInt32
+const  KSPCGType = UInt32
 
 const KSP_CG_SYMMETRIC = (UInt32)(0)
 const KSP_CG_HERMITIAN = (UInt32)(1)
 
 #= # end enum KSPCGType =#
 #= skipping type declaration with undefined symbols:
-immutable _p_KSPFischerGuess
+struct _p_KSPFischerGuess
     method::PetscInt
     curl::PetscInt
     maxl::PetscInt
@@ -3425,31 +3425,31 @@ immutable _p_KSPFischerGuess
     monitor::PetscBool
     mat::Mat
     ksp::KSP
-end 
+end
 =#
 # skipping undefined typealias typealias KSPFischerGuess Ptr{_p_KSPFischerGuess}
 #= # begin enum ANONYMOUS_67 =#
-typealias ANONYMOUS_67 UInt32
+const  ANONYMOUS_67 = UInt32
 
 const MAT_SCHUR_COMPLEMENT_AINV_DIAG = (UInt32)(0)
 const MAT_SCHUR_COMPLEMENT_AINV_LUMP = (UInt32)(1)
 
 #= # end enum ANONYMOUS_67 =#
 #= # begin enum MatSchurComplementAinvType =#
-typealias MatSchurComplementAinvType UInt32
+const  MatSchurComplementAinvType = UInt32
 
 const MAT_SCHUR_COMPLEMENT_AINV_DIAG = (UInt32)(0)
 const MAT_SCHUR_COMPLEMENT_AINV_LUMP = (UInt32)(1)
 
 #= # end enum MatSchurComplementAinvType =#
-immutable _p_SNES
+struct _p_SNES
 end
 
-typealias SNES Ptr{_p_SNES}
-typealias SNESType Symbol
+const  SNES = Ptr{_p_SNES}
+const  SNESType = Symbol
 
 #= # begin enum ANONYMOUS_68 =#
-typealias ANONYMOUS_68 Cint
+const  ANONYMOUS_68 = Cint
 
 const SNES_CONVERGED_FNORM_ABS = (Int32)(2)
 const SNES_CONVERGED_FNORM_RELATIVE = (Int32)(3)
@@ -3468,7 +3468,7 @@ const SNES_CONVERGED_ITERATING = (Int32)(0)
 
 #= # end enum ANONYMOUS_68 =#
 #= # begin enum SNESConvergedReason =#
-typealias SNESConvergedReason Cint
+const  SNESConvergedReason = Cint
 
 const SNES_CONVERGED_FNORM_ABS = (Int32)(2)
 const SNES_CONVERGED_FNORM_RELATIVE = (Int32)(3)
@@ -3487,7 +3487,7 @@ const SNES_CONVERGED_ITERATING = (Int32)(0)
 
 #= # end enum SNESConvergedReason =#
 #= # begin enum ANONYMOUS_69 =#
-typealias ANONYMOUS_69 Cint
+const  ANONYMOUS_69 = Cint
 
 const SNES_NORM_DEFAULT = (Int32)(-1)
 const SNES_NORM_NONE = (Int32)(0)
@@ -3498,7 +3498,7 @@ const SNES_NORM_INITIAL_FINAL_ONLY = (Int32)(4)
 
 #= # end enum ANONYMOUS_69 =#
 #= # begin enum SNESNormSchedule =#
-typealias SNESNormSchedule Cint
+const  SNESNormSchedule = Cint
 
 const SNES_NORM_DEFAULT = (Int32)(-1)
 const SNES_NORM_NONE = (Int32)(0)
@@ -3509,7 +3509,7 @@ const SNES_NORM_INITIAL_FINAL_ONLY = (Int32)(4)
 
 #= # end enum SNESNormSchedule =#
 #= # begin enum ANONYMOUS_70 =#
-typealias ANONYMOUS_70 Cint
+const  ANONYMOUS_70 = Cint
 
 const SNES_FUNCTION_DEFAULT = (Int32)(-1)
 const SNES_FUNCTION_UNPRECONDITIONED = (Int32)(0)
@@ -3517,25 +3517,25 @@ const SNES_FUNCTION_PRECONDITIONED = (Int32)(1)
 
 #= # end enum ANONYMOUS_70 =#
 #= # begin enum SNESFunctionType =#
-typealias SNESFunctionType Cint
+const  SNESFunctionType = Cint
 
 const SNES_FUNCTION_DEFAULT = (Int32)(-1)
 const SNES_FUNCTION_UNPRECONDITIONED = (Int32)(0)
 const SNES_FUNCTION_PRECONDITIONED = (Int32)(1)
 
 #= # end enum SNESFunctionType =#
-immutable _p_LineSearch
+struct _p_LineSearch
 end
 
-typealias SNESLineSearch Ptr{_p_LineSearch}
-typealias SNESLineSearchType Symbol
-typealias SNESLineSearchVIProjectFunc Ptr{Void}
-typealias SNESLineSearchVINormFunc Ptr{Void}
-typealias SNESLineSearchApplyFunc Ptr{Void}
-typealias SNESLineSearchUserFunc Ptr{Void}
+const  SNESLineSearch = Ptr{_p_LineSearch}
+const  SNESLineSearchType = Symbol
+const  SNESLineSearchVIProjectFunc = Ptr{Cvoid}
+const  SNESLineSearchVINormFunc = Ptr{Cvoid}
+const  SNESLineSearchApplyFunc = Ptr{Cvoid}
+const  SNESLineSearchUserFunc = Ptr{Cvoid}
 
 #= # begin enum ANONYMOUS_71 =#
-typealias ANONYMOUS_71 UInt32
+const  ANONYMOUS_71 = UInt32
 
 const SNES_LINESEARCH_SUCCEEDED = (UInt32)(0)
 const SNES_LINESEARCH_FAILED_NANORINF = (UInt32)(1)
@@ -3546,7 +3546,7 @@ const SNES_LINESEARCH_FAILED_FUNCTION = (UInt32)(5)
 
 #= # end enum ANONYMOUS_71 =#
 #= # begin enum SNESLineSearchReason =#
-typealias SNESLineSearchReason UInt32
+const  SNESLineSearchReason = UInt32
 
 const SNES_LINESEARCH_SUCCEEDED = (UInt32)(0)
 const SNES_LINESEARCH_FAILED_NANORINF = (UInt32)(1)
@@ -3556,13 +3556,13 @@ const SNES_LINESEARCH_FAILED_USER = (UInt32)(4)
 const SNES_LINESEARCH_FAILED_FUNCTION = (UInt32)(5)
 
 #= # end enum SNESLineSearchReason =#
-typealias DMDASNESFunction Ptr{Void}
-typealias DMDASNESJacobian Ptr{Void}
-typealias DMDASNESObjective Ptr{Void}
-typealias SNESMSType Symbol
+const  DMDASNESFunction = Ptr{Cvoid}
+const  DMDASNESJacobian = Ptr{Cvoid}
+const  DMDASNESObjective = Ptr{Cvoid}
+const  SNESMSType = Symbol
 
 #= # begin enum ANONYMOUS_72 =#
-typealias ANONYMOUS_72 UInt32
+const  ANONYMOUS_72 = UInt32
 
 const SNES_NGMRES_RESTART_NONE = (UInt32)(0)
 const SNES_NGMRES_RESTART_PERIODIC = (UInt32)(1)
@@ -3570,7 +3570,7 @@ const SNES_NGMRES_RESTART_DIFFERENCE = (UInt32)(2)
 
 #= # end enum ANONYMOUS_72 =#
 #= # begin enum SNESNGMRESRestartType =#
-typealias SNESNGMRESRestartType UInt32
+const  SNESNGMRESRestartType = UInt32
 
 const SNES_NGMRES_RESTART_NONE = (UInt32)(0)
 const SNES_NGMRES_RESTART_PERIODIC = (UInt32)(1)
@@ -3578,7 +3578,7 @@ const SNES_NGMRES_RESTART_DIFFERENCE = (UInt32)(2)
 
 #= # end enum SNESNGMRESRestartType =#
 #= # begin enum ANONYMOUS_73 =#
-typealias ANONYMOUS_73 UInt32
+const  ANONYMOUS_73 = UInt32
 
 const SNES_NGMRES_SELECT_NONE = (UInt32)(0)
 const SNES_NGMRES_SELECT_DIFFERENCE = (UInt32)(1)
@@ -3586,7 +3586,7 @@ const SNES_NGMRES_SELECT_LINESEARCH = (UInt32)(2)
 
 #= # end enum ANONYMOUS_73 =#
 #= # begin enum SNESNGMRESSelectType =#
-typealias SNESNGMRESSelectType UInt32
+const  SNESNGMRESSelectType = UInt32
 
 const SNES_NGMRES_SELECT_NONE = (UInt32)(0)
 const SNES_NGMRES_SELECT_DIFFERENCE = (UInt32)(1)
@@ -3594,7 +3594,7 @@ const SNES_NGMRES_SELECT_LINESEARCH = (UInt32)(2)
 
 #= # end enum SNESNGMRESSelectType =#
 #= # begin enum ANONYMOUS_74 =#
-typealias ANONYMOUS_74 UInt32
+const  ANONYMOUS_74 = UInt32
 
 const SNES_NCG_FR = (UInt32)(0)
 const SNES_NCG_PRP = (UInt32)(1)
@@ -3604,7 +3604,7 @@ const SNES_NCG_CD = (UInt32)(4)
 
 #= # end enum ANONYMOUS_74 =#
 #= # begin enum SNESNCGType =#
-typealias SNESNCGType UInt32
+const  SNESNCGType = UInt32
 
 const SNES_NCG_FR = (UInt32)(0)
 const SNES_NCG_PRP = (UInt32)(1)
@@ -3614,7 +3614,7 @@ const SNES_NCG_CD = (UInt32)(4)
 
 #= # end enum SNESNCGType =#
 #= # begin enum ANONYMOUS_75 =#
-typealias ANONYMOUS_75 UInt32
+const  ANONYMOUS_75 = UInt32
 
 const SNES_QN_SCALE_DEFAULT = (UInt32)(0)
 const SNES_QN_SCALE_NONE = (UInt32)(1)
@@ -3624,7 +3624,7 @@ const SNES_QN_SCALE_JACOBIAN = (UInt32)(4)
 
 #= # end enum ANONYMOUS_75 =#
 #= # begin enum SNESQNScaleType =#
-typealias SNESQNScaleType UInt32
+const  SNESQNScaleType = UInt32
 
 const SNES_QN_SCALE_DEFAULT = (UInt32)(0)
 const SNES_QN_SCALE_NONE = (UInt32)(1)
@@ -3634,7 +3634,7 @@ const SNES_QN_SCALE_JACOBIAN = (UInt32)(4)
 
 #= # end enum SNESQNScaleType =#
 #= # begin enum ANONYMOUS_76 =#
-typealias ANONYMOUS_76 UInt32
+const  ANONYMOUS_76 = UInt32
 
 const SNES_QN_RESTART_DEFAULT = (UInt32)(0)
 const SNES_QN_RESTART_NONE = (UInt32)(1)
@@ -3643,7 +3643,7 @@ const SNES_QN_RESTART_PERIODIC = (UInt32)(3)
 
 #= # end enum ANONYMOUS_76 =#
 #= # begin enum SNESQNRestartType =#
-typealias SNESQNRestartType UInt32
+const  SNESQNRestartType = UInt32
 
 const SNES_QN_RESTART_DEFAULT = (UInt32)(0)
 const SNES_QN_RESTART_NONE = (UInt32)(1)
@@ -3652,7 +3652,7 @@ const SNES_QN_RESTART_PERIODIC = (UInt32)(3)
 
 #= # end enum SNESQNRestartType =#
 #= # begin enum ANONYMOUS_77 =#
-typealias ANONYMOUS_77 UInt32
+const  ANONYMOUS_77 = UInt32
 
 const SNES_QN_LBFGS = (UInt32)(0)
 const SNES_QN_BROYDEN = (UInt32)(1)
@@ -3660,7 +3660,7 @@ const SNES_QN_BADBROYDEN = (UInt32)(2)
 
 #= # end enum ANONYMOUS_77 =#
 #= # begin enum SNESQNType =#
-typealias SNESQNType UInt32
+const  SNESQNType = UInt32
 
 const SNES_QN_LBFGS = (UInt32)(0)
 const SNES_QN_BROYDEN = (UInt32)(1)
@@ -3668,7 +3668,7 @@ const SNES_QN_BADBROYDEN = (UInt32)(2)
 
 #= # end enum SNESQNType =#
 #= # begin enum ANONYMOUS_78 =#
-typealias ANONYMOUS_78 UInt32
+const  ANONYMOUS_78 = UInt32
 
 const SNES_COMPOSITE_ADDITIVE = (UInt32)(0)
 const SNES_COMPOSITE_MULTIPLICATIVE = (UInt32)(1)
@@ -3676,7 +3676,7 @@ const SNES_COMPOSITE_ADDITIVEOPTIMAL = (UInt32)(2)
 
 #= # end enum ANONYMOUS_78 =#
 #= # begin enum SNESCompositeType =#
-typealias SNESCompositeType UInt32
+const  SNESCompositeType = UInt32
 
 const SNES_COMPOSITE_ADDITIVE = (UInt32)(0)
 const SNES_COMPOSITE_MULTIPLICATIVE = (UInt32)(1)
@@ -3684,7 +3684,7 @@ const SNES_COMPOSITE_ADDITIVEOPTIMAL = (UInt32)(2)
 
 #= # end enum SNESCompositeType =#
 #= # begin enum ANONYMOUS_79 =#
-typealias ANONYMOUS_79 UInt32
+const  ANONYMOUS_79 = UInt32
 
 const SNES_FAS_MULTIPLICATIVE = (UInt32)(0)
 const SNES_FAS_ADDITIVE = (UInt32)(1)
@@ -3693,7 +3693,7 @@ const SNES_FAS_KASKADE = (UInt32)(3)
 
 #= # end enum ANONYMOUS_79 =#
 #= # begin enum SNESFASType =#
-typealias SNESFASType UInt32
+const  SNESFASType = UInt32
 
 const SNES_FAS_MULTIPLICATIVE = (UInt32)(0)
 const SNES_FAS_ADDITIVE = (UInt32)(1)
@@ -3701,31 +3701,31 @@ const SNES_FAS_FULL = (UInt32)(2)
 const SNES_FAS_KASKADE = (UInt32)(3)
 
 #= # end enum SNESFASType =#
-immutable _p_TS
+struct _p_TS
 end
 
-immutable TS{T}
-    pobj::Ptr{Void}
+struct TS{T}
+    pobj::Ptr{Cvoid}
 end
 
-typealias TSType Symbol
+const  TSType = Symbol
 
 #= # begin enum ANONYMOUS_80 =#
-typealias ANONYMOUS_80 UInt32
+const  ANONYMOUS_80 = UInt32
 
 const TS_LINEAR = (UInt32)(0)
 const TS_NONLINEAR = (UInt32)(1)
 
 #= # end enum ANONYMOUS_80 =#
 #= # begin enum TSProblemType =#
-typealias TSProblemType UInt32
+const  TSProblemType = UInt32
 
 const TS_LINEAR = (UInt32)(0)
 const TS_NONLINEAR = (UInt32)(1)
 
 #= # end enum TSProblemType =#
 #= # begin enum ANONYMOUS_81 =#
-typealias ANONYMOUS_81 Cint
+const  ANONYMOUS_81 = Cint
 
 const TS_EQ_UNSPECIFIED = (Int32)(-1)
 const TS_EQ_EXPLICIT = (Int32)(0)
@@ -3743,7 +3743,7 @@ const TS_EQ_DAE_IMPLICIT_INDEXHI = (Int32)(1500)
 
 #= # end enum ANONYMOUS_81 =#
 #= # begin enum TSEquationType =#
-typealias TSEquationType Cint
+const  TSEquationType = Cint
 
 const TS_EQ_UNSPECIFIED = (Int32)(-1)
 const TS_EQ_EXPLICIT = (Int32)(0)
@@ -3761,7 +3761,7 @@ const TS_EQ_DAE_IMPLICIT_INDEXHI = (Int32)(1500)
 
 #= # end enum TSEquationType =#
 #= # begin enum ANONYMOUS_82 =#
-typealias ANONYMOUS_82 Cint
+const  ANONYMOUS_82 = Cint
 
 const TS_CONVERGED_ITERATING = (Int32)(0)
 const TS_CONVERGED_TIME = (Int32)(1)
@@ -3773,7 +3773,7 @@ const TS_DIVERGED_STEP_REJECTED = (Int32)(-2)
 
 #= # end enum ANONYMOUS_82 =#
 #= # begin enum TSConvergedReason =#
-typealias TSConvergedReason Cint
+const  TSConvergedReason = Cint
 
 const TS_CONVERGED_ITERATING = (Int32)(0)
 const TS_CONVERGED_TIME = (Int32)(1)
@@ -3785,7 +3785,7 @@ const TS_DIVERGED_STEP_REJECTED = (Int32)(-2)
 
 #= # end enum TSConvergedReason =#
 #= # begin enum ANONYMOUS_83 =#
-typealias ANONYMOUS_83 UInt32
+const  ANONYMOUS_83 = UInt32
 
 const TS_EXACTFINALTIME_STEPOVER = (UInt32)(0)
 const TS_EXACTFINALTIME_INTERPOLATE = (UInt32)(1)
@@ -3793,76 +3793,76 @@ const TS_EXACTFINALTIME_MATCHSTEP = (UInt32)(2)
 
 #= # end enum ANONYMOUS_83 =#
 #= # begin enum TSExactFinalTimeOption =#
-typealias TSExactFinalTimeOption UInt32
+const  TSExactFinalTimeOption = UInt32
 
 const TS_EXACTFINALTIME_STEPOVER = (UInt32)(0)
 const TS_EXACTFINALTIME_INTERPOLATE = (UInt32)(1)
 const TS_EXACTFINALTIME_MATCHSTEP = (UInt32)(2)
 
 #= # end enum TSExactFinalTimeOption =#
-immutable _p_TSTrajectory
+struct _p_TSTrajectory
 end
 
-typealias TSTrajectory Ptr{_p_TSTrajectory}
-typealias TSTrajectoryType Symbol
+const  TSTrajectory = Ptr{_p_TSTrajectory}
+const  TSTrajectoryType = Symbol
 
-immutable _n_TSMonitorDrawCtx
+struct _n_TSMonitorDrawCtx
 end
 
-typealias TSMonitorDrawCtx Ptr{_n_TSMonitorDrawCtx}
-typealias TSRHSFunction Ptr{Void}
-typealias TSRHSJacobian Ptr{Void}
-typealias TSSolutionFunction Ptr{Void}
-typealias TSIFunction Ptr{Void}
-typealias TSIJacobian Ptr{Void}
-typealias DMDATSRHSFunctionLocal Ptr{Void}
-typealias DMDATSRHSJacobianLocal Ptr{Void}
-typealias DMDATSIFunctionLocal Ptr{Void}
-typealias DMDATSIJacobianLocal Ptr{Void}
+const  TSMonitorDrawCtx = Ptr{_n_TSMonitorDrawCtx}
+const  TSRHSFunction = Ptr{Cvoid}
+const  TSRHSJacobian = Ptr{Cvoid}
+const  TSSolutionFunction = Ptr{Cvoid}
+const  TSIFunction = Ptr{Cvoid}
+const  TSIJacobian = Ptr{Cvoid}
+const  DMDATSRHSFunctionLocal = Ptr{Cvoid}
+const  DMDATSRHSJacobianLocal = Ptr{Cvoid}
+const  DMDATSIFunctionLocal = Ptr{Cvoid}
+const  DMDATSIJacobianLocal = Ptr{Cvoid}
 
-immutable _n_TSMonitorLGCtx
+struct _n_TSMonitorLGCtx
 end
 
-typealias TSMonitorLGCtx Ptr{_n_TSMonitorLGCtx}
+const  TSMonitorLGCtx = Ptr{_n_TSMonitorLGCtx}
 
-immutable TSMonitorDMDARayCtx
+struct TSMonitorDMDARayCtx
     ray::Vec
     scatter::VecScatter
     viewer::PetscViewer
     lgctx::TSMonitorLGCtx
 end
 
-immutable _n_TSMonitorEnvelopeCtx
+struct _n_TSMonitorEnvelopeCtx
 end
 
-typealias TSMonitorEnvelopeCtx Ptr{_n_TSMonitorEnvelopeCtx}
+const  TSMonitorEnvelopeCtx = Ptr{_n_TSMonitorEnvelopeCtx}
 
-immutable _n_TSMonitorSPEigCtx
+struct _n_TSMonitorSPEigCtx
 end
 
-typealias TSMonitorSPEigCtx Ptr{_n_TSMonitorSPEigCtx}
-typealias TSSSPType Symbol
+const  TSMonitorSPEigCtx = Ptr{_n_TSMonitorSPEigCtx}
+const  TSSSPType = Symbol
 
-immutable _p_TSAdapt
+struct _p_TSAdapt
 end
 
-typealias TSAdapt Ptr{_p_TSAdapt}
-typealias TSAdaptType Symbol
+const  TSAdapt = Ptr{_p_TSAdapt}
+const  TSAdaptType = Symbol
 
-immutable _p_TSGLAdapt
+struct _p_TSGLAdapt
 end
 
-typealias TSGLAdapt Ptr{_p_TSGLAdapt}
-typealias TSGLAdaptType Symbol
-typealias TSGLAcceptType Symbol
-typealias TSGLAcceptFunction Ptr{Void}
-typealias TSGLType Symbol
-typealias TSRKType Symbol
-typealias TSARKIMEXType Symbol
-typealias TSRosWType Symbol
+const  TSGLAdapt = Ptr{_p_TSGLAdapt}
+const  TSGLAdaptType = Symbol
+const  TSGLAcceptType = Symbol
+const  TSGLAcceptFunction = Ptr{Cvoid}
+const  TSGLType = Symbol
+const  TSRKType = Symbol
+const  TSARKIMEXType = Symbol
+const  TSRosWType = Symbol
 
 #= # begin enum ANONYMOUS_84 =#
-typealias ANONYMOUS_84 UInt32
+const  ANONYMOUS_84 = UInt32
 
 const TAO_SUBSET_SUBVEC = (UInt32)(0)
 const TAO_SUBSET_MASK = (UInt32)(1)
@@ -3870,20 +3870,20 @@ const TAO_SUBSET_MATRIXFREE = (UInt32)(2)
 
 #= # end enum ANONYMOUS_84 =#
 #= # begin enum TaoSubsetType =#
-typealias TaoSubsetType UInt32
+const  TaoSubsetType = UInt32
 
 const TAO_SUBSET_SUBVEC = (UInt32)(0)
 const TAO_SUBSET_MASK = (UInt32)(1)
 const TAO_SUBSET_MATRIXFREE = (UInt32)(2)
 
 #= # end enum TaoSubsetType =#
-immutable _p_Tao
+struct _p_Tao
 end
 
-typealias Tao Ptr{_p_Tao}
+const  Tao = Ptr{_p_Tao}
 
 #= # begin enum ANONYMOUS_85 =#
-typealias ANONYMOUS_85 Cint
+const  ANONYMOUS_85 = Cint
 
 const TAO_CONVERGED_FATOL = (Int32)(1)
 const TAO_CONVERGED_FRTOL = (Int32)(2)
@@ -3903,7 +3903,7 @@ const TAO_CONTINUE_ITERATING = (Int32)(0)
 
 #= # end enum ANONYMOUS_85 =#
 #= # begin enum TaoConvergedReason =#
-typealias TaoConvergedReason Cint
+const  TaoConvergedReason = Cint
 
 const TAO_CONVERGED_FATOL = (Int32)(1)
 const TAO_CONVERGED_FRTOL = (Int32)(2)
@@ -3922,13 +3922,13 @@ const TAO_DIVERGED_USER = (Int32)(-8)
 const TAO_CONTINUE_ITERATING = (Int32)(0)
 
 #= # end enum TaoConvergedReason =#
-immutable _p_TaoLineSearch
+struct _p_TaoLineSearch
 end
 
-typealias TaoLineSearch Ptr{_p_TaoLineSearch}
+const  TaoLineSearch = Ptr{_p_TaoLineSearch}
 
 #= # begin enum ANONYMOUS_86 =#
-typealias ANONYMOUS_86 Cint
+const  ANONYMOUS_86 = Cint
 
 const TAOLINESEARCH_FAILED_INFORNAN = (Int32)(-1)
 const TAOLINESEARCH_FAILED_BADPARAMETER = (Int32)(-2)
@@ -3945,7 +3945,7 @@ const TAOLINESEARCH_HALTED_USER = (Int32)(8)
 
 #= # end enum ANONYMOUS_86 =#
 #= # begin enum TaoLineSearchConvergedReason =#
-typealias TaoLineSearchConvergedReason Cint
+const  TaoLineSearchConvergedReason = Cint
 
 const TAOLINESEARCH_FAILED_INFORNAN = (Int32)(-1)
 const TAOLINESEARCH_FAILED_BADPARAMETER = (Int32)(-2)

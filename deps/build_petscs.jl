@@ -30,7 +30,7 @@ const build_names = ["RealDouble", "RealSingle", "ComplexDouble"]
 build_control = Dict() # dirname => whether or not to build it
 arches = Dict() # dict of dirname => (PETSC_DIR, PETSC_ARCH)
 build_any = false  # whether or not to build anything
-have_petsc = Array{Bool}(3)  # whether or not each version of Petsc is usable
+have_petsc = fill(false,3)  # whether or not each version of Petsc is usable
 for (i, name) in enumerate(build_names)
   if haskey(ENV, string("JULIA_PETSC_", name, "_DIR")) || haskey(ENV, string("JULIA_PETSC_", name, "_ARCH"))
     if !(haskey(ENV, string("JULIA_PETSC_", name, "_DIR")) && haskey(ENV, string("JULIA_PETSC_", name, "_DIR")))
@@ -124,7 +124,7 @@ end
 
 for scalar_type in ("real", "complex"), precision in ("double", "single")
   # extract the tarfile into a new directory:
-  name_i = ucfirst(scalar_type) * ucfirst(precision)
+  name_i = uppercasefirst(scalar_type) * uppercasefirst(precision)
   name_i == "ComplexSingle" && continue # PETSc doesn't support this (weird!)
   !build_control[name_i] && continue # skip if the user said not to build this one
   println("****************************************************************")

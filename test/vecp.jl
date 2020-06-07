@@ -79,7 +79,7 @@
     petsc_idx = collect(PetscInt, local_range)
 
     ao = AO(ST, app_idx, petsc_idx)
-    
+
     # transform back
     idx_arr = copy(petsc_idx)
     map_petsc_to_app!(ao, idx_arr)
@@ -102,5 +102,4 @@
     @test working_is == is_petsc
 
   end
-end 
-    
+end

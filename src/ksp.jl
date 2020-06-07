@@ -7,22 +7,22 @@ export KSP, petscview
 ###########################################################################
 
 # solver context
-type KSP{T}
+mutable struct KSP{T}
   p::C.KSP{T}
-  function KSP(p::C.KSP{T})
-    o = new(p)
-    finalizer(o, PetscDestroy)
+  function KSP(p::C.KSP{T}) where {T}
+    o = new{T}(p)
+    finalizer(PetscDestroy,o)
     return o
   end
 end
 
-comm{T}(a::KSP{T}) = MPI.Comm(C.PetscObjectComm(T, a.p.pobj))
+comm(a::KSP{T}) where {T} = C.PetscObjectComm(T, a.p.pobj)
 
-function PetscDestroy{T}(o::KSP{T})
+function PetscDestroy(o::KSP{T}) where {T}
   PetscFinalized(T) || C.KSPDestroy(Ref(o.p))
 end
 
-function petscview{T}(o::KSP{T})
+function petscview(o::KSP{T}) where {T}
   viewer = C.PetscViewer{T}(C_NULL)
   chk(C.KSPView(o.p, viewer))
 end
@@ -81,7 +81,7 @@ In addition, if default preconditioner is being used,
 then any of the preconditioner options (see `PC`) can be specified to control
 this preconditioner (e.g. `pc_type`).
 """
-function KSP{T}(pc::PC{T}; kws...)
+function KSP(pc::PC{T}; kws...) where {T}
   ksp_c = Ref{C.KSP{T}}()
   chk(C.KSPCreate(comm(pc), ksp_c))
   ksp = ksp_c[]
@@ -89,15 +89,20 @@ function KSP{T}(pc::PC{T}; kws...)
   withoptions(T, kws) do
     chk(C.KSPSetFromOptions(ksp))
   end
-  return KSP{T}(ksp)
+  return KSP(ksp)
 end
 
-KSP{T}(A::Mat{T}, PA::Mat{T}=A; kws...) = KSP(PC(A, PA; kws...); kws...)
+KSP(A::Mat{T}, PA::Mat{T}=A; kws...) where {T} = KSP(PC(A, PA; kws...); kws...)
+
+export KSPSetUp!
+function KSPSetUp!(ksp::KSP{T}) where {T}
+  chk(C.KSPSetUp(ksp.p))
+end
 
 # Retrieve a reference to the matrix in the KSP object, as a raw C.Mat
 # pointer.  Note that we should not wrap this in a Mat object, or
 # call MatDestroy on it, without incrementing its reference count first!
-function _ksp_A{T}(ksp::KSP{T})
+function _ksp_A(ksp::KSP{T}) where {T}
   a = Ref{C.Mat{T}}()
   pa = Ref{C.Mat{T}}()
   chk(C.KSPGetOperators(ksp.p, a, pa))
@@ -105,28 +110,28 @@ function _ksp_A{T}(ksp::KSP{T})
 end
 
 # x = A \ b
-function Base.A_ldiv_B!{T}(ksp::KSP{T}, b::Vec{T}, x::Vec{T})
+function LinearAlgebra.ldiv!(ksp::KSP{T}, b::Vec{T}, x::Vec{T}) where {T}
 
-  assemble(_ksp_A(ksp))
-  assemble(b)
-  assemble(x)
+ assemble(_ksp_A(ksp))
+ assemble(b)
+ assemble(x)
 
-  chk(C.KSPSolve(ksp.p, b.p, x.p))
+ chk(C.KSPSolve(ksp.p, b.p, x.p))
 
-  reason = Ref{Cint}()
-  chk(C.KSPGetConvergedReason(ksp.p, reason))
-  reason[] < 0 && warn("KSP solve did not converge")
+ reason = Ref{Cint}()
+ chk(C.KSPGetConvergedReason(ksp.p, reason))
+ reason[] < 0 && warn("KSP solve did not converge")
 
-  return x
+ return x
 end
 
 # x = A.' \ b
 # Base.At_ldiv_B! does not exist? the non bang version does
-function KSPSolveTranspose!{T}(ksp::KSP{T}, b::Vec{T}, x::Vec{T})
+function KSPSolveTranspose!(ksp::KSP{T}, b::Vec{T}, x::Vec{T}) where {T}
   assemble(_ksp_A(ksp))
   assemble(b)
   assemble(x)
-  
+
   chk(C.KSPSolveTranspose(ksp.p, b.p, x.p))
 
   reason = Ref{Cint}()
@@ -138,7 +143,7 @@ end
 
 # is there nice syntax for this?
 export KSPSolveTranspose
-function KSPSolveTranspose{T}(ksp::KSP{T}, b::Vec{T})
+function KSPSolveTranspose(ksp::KSP{T}, b::Vec{T}) where {T}
 
   x = similar(b, size(ksp, 1))
   KSPSolveTranspose!(ksp, b, x)
@@ -151,15 +156,14 @@ function Base.size(ksp::KSP)
   chk(C.MatGetSize(_ksp_A(ksp), m, n))
   (Int(m[]), Int(n[]))
 end
-Base.size{T}(ksp::KSP{T}, dim::Integer) = dim > 2 ? 1 : size(ksp)[dim]
+Base.size(ksp::KSP{T}, dim::Integer)  where {T} = dim > 2 ? 1 : size(ksp)[dim]
 
 import Base: \
-(\){T}(ksp::KSP{T}, b::Vec{T}) = A_ldiv_B!(ksp, b, similar(b, size(ksp, 2)))
+(\)(ksp::KSP{T}, b::Vec{T}) where {T} = ldiv!(ksp, b, similar(b, size(ksp, 2)))
 
 # Mat fallbacks
-(\){T}(A::Mat{T}, b::Vec{T}) = KSP(A)\b
-Base.A_ldiv_B!{T}(A::Mat{T}, b::Vec{T}, x::Vec{T}) = Base.A_ldiv_B!(KSP(A), b, x)
+(\)(A::Mat{T}, b::Vec{T}) where {T} = KSP(A)\b
+LinearAlgebra.ldiv!(A::Mat{T}, b::Vec{T}, x::Vec{T}) where {T} = ldiv!(KSP(A), b, x)
 
-KSPSolveTranspose{T}(A::Mat{T}, b::Vec{T}) = KSPSolveTranspose(KSP(A), b)
-KSPSolveTranspose{T}(A::Mat{T}, b::Vec{T}, x::Vec{T}) = KSPSOlveTranspose(KSP(A), x, b)
-
+KSPSolveTranspose(A::Mat{T}, b::Vec{T}) where {T} = KSPSolveTranspose(KSP(A), b)
+KSPSolveTranspose(A::Mat{T}, b::Vec{T}, x::Vec{T}) where {T} = KSPSOlveTranspose(KSP(A), x, b)

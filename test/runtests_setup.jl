@@ -1,5 +1,9 @@
 using PETSc
-using Base.Test
+using PETSc.C
+using MPI
+using LinearAlgebra
+using SparseArrays
+using Test
 
 # determine scalar type of current run
 global ST = Float64  # scalar type
@@ -44,7 +48,7 @@ function RT(x::Number)
 
 end
 
-function mymult{T}(A::PETSc.C.Mat{T}, x::PETSc.C.Vec, b::PETSc.C.Vec)
+function mymult(A::PETSc.C.Mat{T}, x::PETSc.C.Vec, b::PETSc.C.Vec) where {T}
 # matrix multiplication function for the shell matrix A
 # A performs the action of A = diagm(1:sys_size)
 
