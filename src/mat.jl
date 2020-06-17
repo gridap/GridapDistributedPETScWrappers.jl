@@ -54,7 +54,7 @@ comm(a::PetscMat{T}) where {T} = C.PetscObjectComm(T, a.p.pobj)
 """
   Create an empty, unsized matrix
 """
-function Mat(::Type{T}, mtype::C.MatType=C.MATSEQAIJ; comm::MPI.Comm=MPI.COMM_WORLD) where {T}
+function Mat(::Type{T}, mtype::C.MatType; comm::MPI.Comm=MPI.COMM_WORLD) where {T}
   p = Ref{C.Mat{T}}()
   chk(C.MatCreate(comm, p))
   chk(C.MatSetType(p[], mtype))
