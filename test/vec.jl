@@ -43,6 +43,10 @@
   vec4 = copy(vec)
   @test vec4 ≈ vec
 
+  fill!(vec4,RC(complex(0.0,0.0)))
+  copy!(vec, vec4)
+  @test vec4 ≈ vec
+
   idx = [1,3, 4]
   vt = RC(complex(2.,2))
   vec4[idx] = vt

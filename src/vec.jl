@@ -385,6 +385,11 @@ function Base.copy(x::Vec)
   y
 end
 
+function Base.copy!(dst::Vec,src::Vec)
+  chk(C.VecCopy(src.p, dst.p))
+end
+
+
 ###############################################################################
 export localIS, local_to_global_mapping, set_local_to_global_mapping, has_local_to_global_mapping
 
