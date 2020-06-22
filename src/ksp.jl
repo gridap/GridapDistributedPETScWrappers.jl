@@ -120,7 +120,9 @@ function LinearAlgebra.ldiv!(ksp::KSP{T}, b::Vec{T}, x::Vec{T}) where {T}
 
  reason = Ref{Cint}()
  chk(C.KSPGetConvergedReason(ksp.p, reason))
- reason[] < 0 && warn("KSP solve did not converge")
+ if (reason[] < 0)
+   @warn "KSP solve did not converge"
+ end
 
  return x
 end
@@ -136,7 +138,9 @@ function KSPSolveTranspose!(ksp::KSP{T}, b::Vec{T}, x::Vec{T}) where {T}
 
   reason = Ref{Cint}()
   chk(C.KSPGetConvergedReason(ksp.p, reason))
-  reason[] < 0 && warn("KSP solve did not converge")
+  if (reason[] < 0)
+    @warn "KSP solve did not converge"
+  end
 
   return x
 end
