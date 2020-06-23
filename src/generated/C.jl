@@ -2,6 +2,7 @@ module C
 
 using Compat
 export PetscInt
+using MPI
 
 include("defs.jl")
 include("libPETSc_commonRealDouble.jl")

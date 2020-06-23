@@ -2014,11 +2014,11 @@ end
     ccall((:PetscPostIrecvScalar,petscRealDouble),PetscErrorCode,(comm_type,PetscMPIInt,PetscMPIInt,Ptr{PetscMPIInt},Ptr{PetscMPIInt},Ptr{Ptr{Ptr{Float64}}},Ptr{Ptr{MPI_Request}}),arg1,arg2,arg3,arg4,arg5,arg6,arg7)
 end
 =#
-#= skipping function with undefined symbols:
- function PetscCommBuildTwoSided(arg0::Type{Float64},arg1::MPI_Comm,arg2::PetscMPIInt,arg3::MPI_Datatype,arg4::Integer,arg5::Union{Ptr{PetscMPIInt},StridedArray{PetscMPIInt},Ptr{PetscMPIInt},Ref{PetscMPIInt}},arg6::Union{Ptr{Cvoid},StridedArray{Cvoid},Ptr{Cvoid},Ref{Cvoid}},arg7::Union{Ptr{Int64},StridedArray{Int64},Ptr{Int64},Ref{Int64}},arg8::Union{Ptr{Ptr{PetscMPIInt}},StridedArray{Ptr{PetscMPIInt}},Ptr{Ptr{PetscMPIInt}},Ref{Ptr{PetscMPIInt}}},arg9::Union{Ptr{Cvoid},StridedArray{Cvoid},Ptr{Cvoid},Ref{Cvoid}})
-    ccall((:PetscCommBuildTwoSided,petscRealDouble),PetscErrorCode,(comm_type,PetscMPIInt,MPI_Datatype,Int64,Ptr{PetscMPIInt},Ptr{Cvoid},Ptr{Int64},Ptr{Ptr{PetscMPIInt}},Ptr{Cvoid}),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9)
+#skipping function with undefined symbols:
+function PetscCommBuildTwoSided(arg0::Type{Float64},arg1::MPI_Comm,arg2::PetscMPIInt,arg3::MPI.MPI_Datatype,arg4::PetscMPIInt,arg5::Union{Ptr{PetscMPIInt},StridedArray{PetscMPIInt},Ptr{PetscMPIInt},Ref{PetscMPIInt}},arg6::Union{Ptr{Cvoid},StridedArray{Cvoid},Ptr{Cvoid},Ref{Cvoid}},arg7::Union{Ptr{PetscMPIInt},StridedArray{PetscMPIInt},Ptr{PetscMPIInt},Ref{PetscMPIInt}},arg8::Union{Ptr{Ptr{PetscMPIInt}},StridedArray{Ptr{PetscMPIInt}},Ptr{Ptr{PetscMPIInt}},Ref{Ptr{PetscMPIInt}}},arg9::Union{Ptr{Cvoid},StridedArray{Cvoid},Ptr{Cvoid},Ref{Cvoid}})
+    ccall((:PetscCommBuildTwoSided,petscRealDouble),PetscErrorCode,(comm_type,PetscMPIInt,MPI.MPI_Datatype,PetscMPIInt,Ptr{PetscMPIInt},Ptr{Cvoid},Ptr{PetscMPIInt},Ptr{Ptr{PetscMPIInt}},Ptr{Cvoid}),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9)
 end
-=#
+
 function PetscCommBuildTwoSidedSetType(arg0::Type{Float64},arg1::MPI_Comm,arg2::PetscBuildTwoSidedType)
     err = ccall((:PetscCommBuildTwoSidedSetType,petscRealDouble),PetscErrorCode,(comm_type,PetscBuildTwoSidedType),arg1,arg2)
     return err
