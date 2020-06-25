@@ -31,6 +31,7 @@ build_control = Dict() # dirname => whether or not to build it
 arches = Dict() # dict of dirname => (PETSC_DIR, PETSC_ARCH)
 build_any = false  # whether or not to build anything
 have_petsc = fill(false,3)  # whether or not each version of Petsc is usable
+libpetsc_name=Dict()
 for (i, name) in enumerate(build_names)
   if haskey(ENV, string("JULIA_PETSC_", name, "_DIR")) || haskey(ENV, string("JULIA_PETSC_", name, "_ARCH"))
     if !(haskey(ENV, string("JULIA_PETSC_", name, "_DIR")) && haskey(ENV, string("JULIA_PETSC_", name, "_DIR")))
@@ -39,6 +40,9 @@ for (i, name) in enumerate(build_names)
       build_control[name] = false
       have_petsc[i] = true
       arches[name] = (ENV[string("JULIA_PETSC_",name, "_DIR")], ENV[string("JULIA_PETSC_", name, "_ARCH")])
+      if (haskey(ENV, string("JULIA_PETSC_", name, "_LIBNAME")))
+        libpetsc_name[name]=ENV[string("JULIA_PETSC_", name, "_LIBNAME")]
+      end
     end
   elseif haskey(ENV, string("JULIA_PETSC_", name, "_NOBUILD"))
     build_control[name] = false
@@ -169,8 +173,11 @@ open("deps.jl", "w") do f
   for (i, name) in enumerate(build_names)
     if haskey(arches, name)
       PETSC_DIR, PETSC_ARCH = arches[name]
-      path = abspath(PETSC_DIR, PETSC_ARCH, "lib", "libpetsc")
-  #    path = abspath(name, petsc_name, arches[name], "lib", "libpetsc")
+      libname="libpetsc"
+      if haskey(libpetsc_name,name)
+        libname=libpetsc_name[name]
+      end
+      path = abspath(PETSC_DIR, PETSC_ARCH, "lib", libname)
       println(f, "const petsc$name = \"", escape_string(path), "\"")
     end
   end
