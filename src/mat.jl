@@ -321,7 +321,7 @@ end
 
 
 function set_block_size(A::Mat{T}, bs::Integer) where {T<:Scalar}
-  chk(C.MatSetBlockSize(A.p, bs))
+  chk(C.MatSetBlockSize(A.p, PetscInt(bs)))
 end
 
 function get_blocksize(A::Mat{T}) where {T<:Scalar}
@@ -360,7 +360,7 @@ function Base.resize!(a::Mat, m::Integer=C.PETSC_DECIDE, n::Integer=C.PETSC_DECI
   if n == nlocal == C.PETSC_DECIDE
     throw(ArgumentError("either the global (n) or local (nlocal) #cols must be specified"))
   end
-  chk(C.MatSetSizes(a.p, mlocal, nlocal, m, n))
+  chk(C.MatSetSizes(a.p, PetscInt(mlocal), PetscInt(nlocal), PetscInt(m), PetscInt(n)))
   a
 end
 
@@ -381,7 +381,7 @@ function setpreallocation!(a::Mat{T};
       end
       isa(nnz,Vector{PetscInt}) ? nnz : PetscInt[ i for i in nnz ]
     end
-    chk(C.MatSeqAIJSetPreallocation(a.p, nz, pnnz))
+    chk(C.MatSeqAIJSetPreallocation(a.p, PetscInt(nz), pnnz))
   elseif MType == C.MATMPIAIJ
     mlocal = sizelocal(a,1)
     pnnz = if isempty(nnz)
@@ -400,7 +400,8 @@ function setpreallocation!(a::Mat{T};
       end
       isa(onnz,Vector{PetscInt}) ? onnz : PetscInt[ i for i in onnz ]
     end
-    chk(C.MatMPIAIJSetPreallocation(a.p, nz, pnnz, onz, ponnz))
+    chk(C.MatMPIAIJSetPreallocation(a.p, PetscInt(nz), pnnz, PetscInt(onz), ponnz))
+
   elseif MType == C.MATMPIBAIJ
     mlocal = sizelocal(a,1)
     pnnz = if isempty(nnz)
@@ -780,7 +781,7 @@ function setindex0!(x::Mat{T}, v::Array{T},
   if length(v) != ni*nj
     throw(ArgumentError("length(values) != length(indices)"))
   end
-  chk(C.MatSetValues(x.p, ni, i, nj, j, v, x.insertmode))
+  chk(C.MatSetValues(x.p, PetscInt(ni), i, PetscInt(nj), j, v, x.insertmode))
   x
 end
 
@@ -792,7 +793,7 @@ function setindex0!(x::SubMat{T}, v::Array{T}, i::Array{PetscInt}, j::Array{Pets
   if length(v) != ni*nj
     throw(ArgumentError("length(values) != length(indices)"))
   end
-  chk(C.MatSetValuesLocal(x.p, ni, i, nj, j, v, x.insertmode))
+  chk(C.MatSetValuesLocal(x.p, PetscInt(ni), i, PetscInt(nj), j, v, x.insertmode))
   x
 end
 
@@ -894,7 +895,7 @@ function getindex0(x::Mat{T}, i::Vector{PetscInt}, j::Vector{PetscInt}) where {T
   ni = length(i)
   nj = length(j)
   v = Array{T}(undef, nj, ni) # row-major!
-  chk(C.MatGetValues(x.p, ni, i, nj, j, v))
+  chk(C.MatGetValues(x.p, PetscInt(ni), i, PetscInt(nj), j, v))
   ni <= 1 || nj <= 1 ? reshape(v, ni, nj) : transpose(v)
 end
 
@@ -917,7 +918,7 @@ getindex(a::PetscMat, i0::Integer, I1::AbstractArray{T1}) where {T1<:Integer} =
 # global, non-block
 function set_values!(x::Mat{T}, idxm::StridedVecOrMat{PetscInt}, idxn::StridedVecOrMat{PetscInt}, v::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
   # v should be m x n
-  chk(C.MatSetValues(x.p, length(idxm), idxm, length(idxn), idxn, v, o))
+  chk(C.MatSetValues(x.p, PetscInt(length(idxm)), idxm, PetscInt(length(idxn)), idxn, v, o))
 end
 
 function set_values!(x::Mat{T}, idxm::StridedVecOrMat{I1}, idxn::StridedVecOrMat{I2}, v::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar, I1 <: Integer, I2 <: Integer}
@@ -953,7 +954,7 @@ end
 function set_values_blocked!(x::Mat{T}, idxm::StridedVecOrMat{PetscInt}, idxn::StridedVecOrMat{PetscInt}, v::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
   # vals should be m*bs x n*bs
-  chk(C.MatSetValuesBlocked(x.p, length(idxm), idxm, length(idxn), idxn, v, o))
+  chk(C.MatSetValuesBlocked(x.p, PetscInt(length(idxm)), idxm, PetscInt(length(idxn)), idxn, v, o))
 end
 
 function set_values_blocked!(x::Mat{T}, idxm::StridedVecOrMat{I1}, idxn::StridedVecOrMat{I2}, v::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar, I1 <: Integer, I2 <: Integer}
@@ -966,7 +967,7 @@ end
 # local, non-block
 function set_values_local!(x::Mat{T}, idxm::StridedVecOrMat{PetscInt}, idxn::StridedVecOrMat{PetscInt}, v::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
-  chk(C.MatSetValuesLocal(x.p, length(idxm), idxm, length(idxn), idxn, v, o))
+  chk(C.MatSetValuesLocal(x.p, PetscInt(length(idxm)), idxm, PetscInt(length(idxn)), idxn, v, o))
 end
 
 function set_values_local!(x::Mat{T}, idxm::StridedVecOrMat{I1}, idxn::StridedVecOrMat{I2}, v::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar, I1 <: Integer, I2 <: Integer}
@@ -984,7 +985,7 @@ end
 # local, block
 function set_values_blocked_local!(x::Mat{T}, idxm::StridedVecOrMat{PetscInt}, idxn::StridedVecOrMat{PetscInt}, v::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
-  chk(C.MatSetValuesBlockedLocal(x.p, length(idxm), idxm, length(idxn), idxn, v, o))
+  chk(C.MatSetValuesBlockedLocal(x.p, PetscInt(length(idxm)), idxm, PetscInt(length(idxn)), idxn, v, o))
 end
 
 function set_values_blocked_local(x::Mat{T}, idxm::StridedVecOrMat{I1}, idxn::StridedVecOrMat{I2}, v::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar, I1 <: Integer, I2 <: Integer}
@@ -1255,8 +1256,8 @@ function MatRow(A::Mat{T}, row::Integer) where {T}
   ref_ncols = Ref{PetscInt}()
   ref_cols = Ref{Ptr{PetscInt}}()
   ref_vals = Ref{Ptr{T}}()
-  chk(C.MatGetRow(A.p, row-1, ref_ncols, ref_cols, ref_vals))
-  return MatRow(A.p, row, ref_ncols[], ref_cols[], ref_vals[])
+  chk(C.MatGetRow(A.p, PetscInt(row-1), ref_ncols, ref_cols, ref_vals))
+  return MatRow(A.p, row, Int(ref_ncols[]), ref_cols[], ref_vals[])
 end
 
 """
@@ -1267,15 +1268,15 @@ function count_row_nz(A::Mat{T}, row::Integer) where {T}
   ref_ncols = Ref{PetscInt}()
   ref_cols = Ref{Ptr{PetscInt}}(C_NULL)
   ref_vals = Ref{Ptr{T}}(C_NULL)
-  chk(C.MatGetRow(A.p, row-1, ref_ncols, ref_cols, ref_vals))
+  chk(C.MatGetRow(A.p, PetscInt(row-1), ref_ncols, ref_cols, ref_vals))
   ncols = ref_ncols[]
-  chk(C.MatRestoreRow(A.p, row-1, ref_ncols, ref_cols, ref_vals))
+  chk(C.MatRestoreRow(A.p, PetscInt(row-1), ref_ncols, ref_cols, ref_vals))
 
   return ncols
 end
 function restore(row::MatRow{T}) where {T}
 #  if !PetscFinalized(T) && !isfinalized(row.mat)
-    C.MatRestoreRow(row.mat, row.row-1, Ref(PetscInt(row.ncols)), Ref{Ptr{PetscInt}}(C_NULL), Ref{Ptr{T}}(C_NULL))
+    C.MatRestoreRow(row.mat, PetscInt(row.row-1), Ref(PetscInt(row.ncols)), Ref{Ptr{PetscInt}}(C_NULL), Ref{Ptr{T}}(C_NULL))
 
 #    return nothing  # return type stability
 #  end

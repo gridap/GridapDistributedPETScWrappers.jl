@@ -181,6 +181,6 @@ open("deps.jl", "w") do f
       println(f, "const petsc$name = \"", escape_string(path), "\"")
     end
   end
-  println(f, "const PetscInt = Int64")
+  println(f, "const PetscInt = Int32")
   println(f, "const have_petsc = [", have_petsc[1], " ", have_petsc[2], " ", have_petsc[3], "]")
 end

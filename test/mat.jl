@@ -316,8 +316,8 @@ end
     bs=2
     mat = PETSc.Mat(ST, 6, 6, bs=bs)
     matj = zeros(ST, 12, 12)
-    idx = [0, 1]
-    idy = [0, 1, 2]
+    idx = PetscInt[0, 1]
+    idy = PetscInt[0, 1, 2]
     vals = rand(ST, bs*length(idx), bs*length(idy))
     set_values_blocked!(mat, idx, idy, vals)
     assemble(mat)

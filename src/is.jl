@@ -23,7 +23,7 @@ end
 # internal constructor, takes array of zero-based indices:
 function IS_(::Type{T}, idx::Array{PetscInt}; comm::MPI.Comm=MPI.COMM_WORLD) where {T<:Scalar}
   is_c = Ref{C.IS{T}}()
-  chk(C.ISCreateGeneral(comm, length(idx), idx, C.PETSC_COPY_VALUES, is_c))
+  chk(C.ISCreateGeneral(comm, PetscInt(length(idx)), idx, C.PETSC_COPY_VALUES, is_c))
   return IS{T}(is_c[])
 end
 
@@ -32,7 +32,7 @@ IS(::Type{T}, idx::AbstractArray{I}; comm::MPI.Comm=MPI.COMM_WORLD) where {I<:In
 
 function IS(::Type{T}, idx::AbstractRange{I}; comm::MPI.Comm=MPI.COMM_WORLD) where {I<:Integer, T<:Scalar}
   is_c = Ref{C.IS{T}}()
-  chk(C.ISCreateStride(comm, length(idx), first(idx)-1, step(idx), is_c))
+  chk(C.ISCreateStride(comm, PetscInt(length(idx)), PetscInt(first(idx)-1), PetscInt(step(idx)), is_c))
   return IS{T}(is_c[])
 end
 
@@ -44,7 +44,7 @@ end
 
 function ISBlock_(::Type{T}, bs::Integer, idx::AbstractArray{PetscInt};comm=MPI.COMM_WORLD) where {T}
   is_c = Ref{C.IS{T}}()
-  chk(C.ISCreateBlock(comm, bs, length(idx), idx, C.PETSC_COPY_VALUES, is_c))
+  chk(C.ISCreateBlock(comm, PetscInt(bs), PetscInt(length(idx)), idx, C.PETSC_COPY_VALUES, is_c))
   return IS{T}(is_c[])
 end
 
@@ -119,7 +119,7 @@ Base.Vector{T}(i::IS) where T<:Integer = convert(Vector{T},i)
 export set_blocksize, get_blocksize
 
 function set_blocksize(is::IS, bs::Integer)
-  chk(C.ISSetBlockSize(is.p, bs))
+  chk(C.ISSetBlockSize(is.p, PetscInt(bs)))
 end
 
 function get_blocksize(is::IS)

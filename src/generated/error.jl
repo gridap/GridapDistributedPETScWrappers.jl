@@ -28,7 +28,7 @@ function PetscErrorMessage(errnum)
   msg_ptr = Ref{Ptr{UInt8}}(C_NULL)
   # use the first petsc library for all cases
   println(stderr, "errnum = ", errnum)
-  C.PetscErrorMessage(C.petsc_type[1], errnum, msg_ptr, Ref{Ptr{UInt8}}(C_NULL))
+  C.PetscErrorMessage(C.petsc_type[1], PetscErrorCode(errnum), msg_ptr, Ref{Ptr{UInt8}}(C_NULL))
   # error num strings are stored in a constant table so
   # the pointer does not have to be free'd here
   if msg_ptr[] == C_NULL

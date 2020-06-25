@@ -123,13 +123,13 @@ end
 # make a Vec that is a wrapper around v, where v stores the local data
 function Vec(v::Vector{T}; comm::MPI.Comm=MPI.COMM_WORLD) where {T<:Scalar}
   p = Ref{C.Vec{T}}()
-  chk(C.VecCreateMPIWithArray(comm, 1, length(v), C.PETSC_DECIDE, v, p))
+  chk(C.VecCreateMPIWithArray(comm, PetscInt(1), PetscInt(length(v)), PetscInt(C.PETSC_DECIDE), v, p))
   pv = Vec{T}(p[], v)
   return pv
 end
 
 function set_block_size(v::Vec{T}, bs::Integer) where {T<:Scalar}
-  chk(C.VecSetBlockSize(v.p, bs))
+  chk(C.VecSetBlockSize(v.p, PetscInt(bs)))
 end
 
 function get_blocksize(v::Vec{T}) where {T<:Scalar}
@@ -228,8 +228,7 @@ function Base.resize!(x::Vec, m::Integer=C.PETSC_DECIDE; mlocal::Integer=C.PETSC
   if m == mlocal == C.PETSC_DECIDE
     throw(ArgumentError("either the length (m) or local length (mlocal) must be specified"))
   end
-
-  chk(C.VecSetSizes(x.p, mlocal, m))
+  chk(C.VecSetSizes(x.p, PetscInt(mlocal), PetscInt(m)))
   x
 end
 
@@ -525,7 +524,7 @@ function setindex0!(x::Vec{T}, v::Array{T}, i::Array{PetscInt}) where {T}
     throw(ArgumentError("length(values) != length(indices)"))
   end
   #    println("  in setindex0, passed bounds check")
-  chk(C.VecSetValues(x.p, n, i, v, x.insertmode))
+  chk(C.VecSetValues(x.p, PetscInt(n), i, v, x.insertmode))
   x.assembled = false
   x
 end
@@ -603,7 +602,7 @@ import Base.getindex
 # like getindex but for 0-based indices i
 function getindex0(x::Vec{T}, i::Vector{PetscInt}) where {T}
   v = similar(i, T)
-  chk(C.VecGetValues(x.p, length(i), i, v))
+  chk(C.VecGetValues(x.p, PetscInt(length(i)), i, v))
   v
 end
 
@@ -622,7 +621,7 @@ export set_values!, set_values_blocked!, set_values_local!, set_values_blocked_l
 function set_values!(x::Vec{T}, idxs::StridedVecOrMat{PetscInt},
                                  vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
-  chk(C.VecSetValues(x.p, length(idxs), idxs, vals, o))
+  chk(C.VecSetValues(x.p, PetscInt(length(idxs)), idxs, vals, o))
 end
 
 function set_values!(x::Vec{T}, idxs::StridedVecOrMat{I},
@@ -653,7 +652,7 @@ end
 function set_values_blocked!(x::Vec{T}, idxs::StridedVecOrMat{PetscInt},
                                           vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
-  chk(C.VecSetValuesBlocked(x.p, length(idxs), idxs, vals, o))
+  chk(C.VecSetValuesBlocked(x.p, PetscInt(length(idxs)), idxs, vals, o))
 end
 
 function set_values_blocked!(x::Vec{T},
@@ -670,7 +669,7 @@ end
 function set_values_local!(x::Vec{T}, idxs::StridedVecOrMat{PetscInt},
                                        vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
-  chk(C.VecSetValuesLocal(x.p, length(idxs), idxs, vals, o))
+  chk(C.VecSetValuesLocal(x.p, PetscInt(length(idxs)), idxs, vals, o))
 end
 
 function set_values_local!(x::Vec{T},
@@ -704,7 +703,7 @@ function set_values_blocked_local!(x::Vec{T},
                                    idxs::StridedVecOrMat{PetscInt},
                                    vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
-  chk(C.VecSetValuesBlockedLocal(x.p, length(idxs), idxs, vals, o))
+  chk(C.VecSetValuesBlockedLocal(x.p, PetscInt(length(idxs)), idxs, vals, o))
 end
 
 
@@ -1011,7 +1010,7 @@ function axpy!(y::V, alpha::AbstractArray, x::AbstractArray{V}) where {V<:Vec}
   length(alpha) == n || throw(BoundsError())
   _x = [X.p for X in x]
   _alpha = eltype(y)[a for a in alpha]
-  C.VecMAXPY(y.p, n, _alpha, _x)
+  C.VecMAXPY(y.p, PetscInt(n), _alpha, _x)
   y
 end
 
