@@ -7,7 +7,7 @@ export VecScatter
 
   function VecScatter{T}(p::C.VecScatter{T}) where {T}
     o = new{T}(p)
-    finalizer(VecScatterDestroy, o)
+    #finalizer(VecScatterDestroy, o)
     return o
   end
 end

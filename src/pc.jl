@@ -5,7 +5,7 @@ mutable struct PC{T}
   p::C.PC{T}
   function PC(p::C.PC{T}) where {T}
     o = new{T}(p)
-    finalizer(PetscDestroy,o)
+    #finalizer(PetscDestroy,o)
     return o
   end
 end

@@ -537,6 +537,11 @@ function PetscFreeArguments(arg0::Type{Float64},arg1::Union{Ptr{Ptr{UInt8}},Stri
     return err
 end
 
+function PetscFreeAlign(arg0::Type{Float64},arg1::Union{Ptr{Cvoid},StridedArray{Cvoid},Ptr{Cvoid},Ref{Cvoid}},arg2::Cint,arg3::Union{String,Cstring,Symbol,Array{UInt8},Ptr{UInt8}},arg4::Union{String,Cstring,Symbol,Array{UInt8},Ptr{UInt8}})
+    err = ccall((:PetscTrFree,petscRealDouble),PetscErrorCode,(Ptr{Cvoid},Cint,Cstring,Cstring),arg1,arg2,arg3,arg4)
+    return err
+end
+
 function PetscEnd(arg0::Type{Float64})
     err = ccall((:PetscEnd,petscRealDouble),PetscErrorCode,())
     return err
