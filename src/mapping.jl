@@ -18,9 +18,9 @@ function AO_(::Type{T}, app_idx::AbstractArray{PetscInt, 1},
             petsc_idx::AbstractArray{PetscInt, 1}; comm=MPI.COMM_WORLD, basic=true ) where {T}
   ao_ref = Ref{C.AO{T}}()
   if basic  # mapping is one-to-one and onto
-    chk(C.AOCreateBasic(comm, length(app_idx), app_idx, petsc_idx, ao_ref))
+    chk(C.AOCreateBasic(comm, PetscInt(length(app_idx)), app_idx, petsc_idx, ao_ref))
   else  # worse performance
-    chk(C.AOCreateMapping(comm, length(app_idx), app_idx, petsc_idx, ao_ref))
+    chk(C.AOCreateMapping(comm, PetscInt(length(app_idx)), app_idx, petsc_idx, ao_ref))
   end
 
   return AO(ao_ref[])
@@ -84,7 +84,7 @@ function map_petsc_to_app!(ao::AO, idx::AbstractArray)
     idx[i] -= 1
   end
 
-  chk(C.AOPetscToApplication(ao.p, length(idx), idx))
+  chk(C.AOPetscToApplication(ao.p, PetscInt(length(idx)), idx))
 
   # increment back to 1-based indices
    for i=1:length(idx)
@@ -103,7 +103,7 @@ function map_app_to_petsc!(ao::AO, idx::AbstractArray)
     idx[i] -= 1
   end
 
-  chk(C.AOApplicationToPetsc(ao.p, length(idx), idx))
+  chk(C.AOApplicationToPetsc(ao.p, PetscInt(length(idx)), idx))
 
   # increment back to 1-based indices
    for i=1:length(idx)
