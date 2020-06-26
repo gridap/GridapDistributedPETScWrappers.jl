@@ -155,9 +155,9 @@ function VecGhost(::Type{T}, mlocal::Integer,
 
     vref = Ref{C.Vec{T}}()
     if bs == 1
-      chk(C.VecCreateGhost(comm, mlocal, m, nghost, ghost_idx2, vref))
+      chk(C.VecCreateGhost(comm, PetscInt(mlocal), PetscInt(m), PetscInt(nghost), ghost_idx2, vref))
     elseif bs > 1
-      chk(C.VecCreateGhostBlock(comm, bs, mlocal, mlocal, m, nghost, ghost_idx2, vref))
+      chk(C.VecCreateGhostBlock(comm, PetscInt(bs), PetscInt(mlocal), PetscInt(mlocal), PetscInt(m), PetscInt(nghost), ghost_idx2, vref))
     else
       println(stderr, "WARNING: unsupported block size requested, bs = ", bs)
     end
