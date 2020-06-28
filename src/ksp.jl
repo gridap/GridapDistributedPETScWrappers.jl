@@ -11,7 +11,7 @@ mutable struct KSP{T}
   p::C.KSP{T}
   function KSP(p::C.KSP{T}) where {T}
     o = new{T}(p)
-    #finalizer(PetscDestroy,o)
+    finalizer(PetscDestroy,o)
     return o
   end
 end

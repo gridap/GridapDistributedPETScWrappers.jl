@@ -21,7 +21,7 @@ mutable struct Mat{T} <: PetscMat{T}
   function Mat{T}(p::C.Mat{T}, data=nothing; first_instance::Bool=true, verify_assembled=true) where {T}
     A = new{T}(p, verify_assembled, C.INSERT_VALUES, data)
     if first_instance  # if the pointer p has not been put into a Mat before
-      #finalizer(PetscDestroy, A)
+      finalizer(PetscDestroy, A)
     end
 
     return A
@@ -40,7 +40,7 @@ mutable struct SubMat{T} <: PetscMat{T}
             # in Petsc (for some unknown reason)
   function SubMat(p::C.Mat{T}, data=nothing; verify_assembled=true) where {T}
     A = new{T}(p, verify_assembled, C.INSERT_VALUES, data)
-    #finalizer(SubMatRestore, A)
+    finalizer(SubMatRestore, A)
     return A
   end
 end
