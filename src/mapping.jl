@@ -18,7 +18,8 @@ function AO_(::Type{T}, app_idx::AbstractArray{PetscInt, 1},
             petsc_idx::AbstractArray{PetscInt, 1}; comm=MPI.COMM_WORLD, basic=true ) where {T}
   ao_ref = Ref{C.AO{T}}()
   if basic  # mapping is one-to-one and onto
-    chk(C.AOCreateBasic(comm, PetscInt(length(app_idx)), app_idx, petsc_idx, ao_ref))
+    #chk(C.AOCreateBasic(comm, PetscInt(length(app_idx)), app_idx, petsc_idx, ao_ref))
+    chk(C.AOCreateMemoryScalable(comm, PetscInt(length(app_idx)), app_idx, petsc_idx, ao_ref))
   else  # worse performance
     chk(C.AOCreateMapping(comm, PetscInt(length(app_idx)), app_idx, petsc_idx, ao_ref))
   end
