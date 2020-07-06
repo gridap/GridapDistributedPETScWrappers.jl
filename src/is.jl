@@ -164,7 +164,7 @@ end
 function ISLocalToGlobalMapping(::Type{T}, indices::AbstractArray{I}, bs=1; comm=MPI_COMM_WORLD, copymode=C.PETSC_COPY_VALUES) where {T, I <: Integer}
 
   indices_0 = PetscInt[ i-1 for i in indices]
-  return _ISLocalToGlobalMapping(t, indices, bs=bs, comm=comm, copymode=copymode)
+  return _ISLocalToGlobalMapping(T, indices, bs=bs, comm=comm, copymode=copymode)
 
 end
 
