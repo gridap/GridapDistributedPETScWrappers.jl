@@ -150,21 +150,21 @@ end
 
 
 # zero based, not exported
-function _ISLocalToGlobalMapping(::Type{T}, indices::AbstractArray{PetscInt}, bs=1; comm=MPI_COMM_WORLD, copymode=C.PETSC_COPY_VALUES) where {T}
+function _ISLocalToGlobalMapping(::Type{T}, indices::AbstractArray{PetscInt}, bs=1; comm=MPI.COMM_WORLD, copymode=C.PETSC_COPY_VALUES) where {T}
 
-  isltog = Ref{C.ISLocalToGlobalMapping}()
+  isltog = Ref{C.ISLocalToGlobalMapping{T}}()
   chk(C.ISLocalToGlobalMappingCreate(comm, PetscInt(bs), PetscInt(length(indices)), indices, copymode, isltog))
 
-  return ISLocalToGlobalMapping(isltog[])
+  return ISLocalToGlobalMapping{T}(isltog[])
 end
 
 # one based, exported
 #TODO: add a data argument to ISLocalToGlobalMapping, to store intermediate
 # array for copymode = don't copy
-function ISLocalToGlobalMapping(::Type{T}, indices::AbstractArray{I}, bs=1; comm=MPI_COMM_WORLD, copymode=C.PETSC_COPY_VALUES) where {T, I <: Integer}
+function ISLocalToGlobalMapping(::Type{T}, indices::AbstractArray{I}, bs=1; comm=MPI.COMM_WORLD, copymode=C.PETSC_COPY_VALUES) where {T, I <: Integer}
 
   indices_0 = PetscInt[ i-1 for i in indices]
-  return _ISLocalToGlobalMapping(T, indices, bs; comm=comm, copymode=copymode)
+  return _ISLocalToGlobalMapping(T, indices_0, bs; comm=comm, copymode=copymode)
 
 end
 
