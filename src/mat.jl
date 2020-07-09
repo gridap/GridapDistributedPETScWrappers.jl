@@ -974,7 +974,7 @@ function set_values_local!(x::Mat{T}, idxm::StridedVecOrMat{I1}, idxn::StridedVe
 
   _idxm = PetscInt[ i for i in idxm]
   _idxn = PetscInt[ i for i in idxn]
-  set_values_local!(x, idxm, idxn, v, o)
+  set_values_local!(x, _idxm, _idxn, v, o)
 end
 
 function set_values_local!(x::Matrix, idxm::AbstractArray, idxn::AbstractArray, v::AbstractArray, o::C.InsertMode=C.INSERT_VALUES)
