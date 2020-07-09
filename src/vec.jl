@@ -357,7 +357,12 @@ end
 function Base.similar(x::Vec{T}) where {T}
   p = Ref{C.Vec{T}}()
   chk(C.VecDuplicate(x.p, p))
-  Vec{T}(p[])
+  v=Vec{T}(p[])
+  v.assembled        = x.assembled
+  v.verify_assembled = x.verify_assembled
+  v.data             = x.data
+  v.insertmode       = x.insertmode
+  v
 end
 
 Base.similar(x::Vec{T}, ::Type{T}) where {T} = similar(x)
