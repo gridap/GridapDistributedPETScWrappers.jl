@@ -650,7 +650,11 @@ Base.similar(a::PetscMat{T}, d::Dims{2}) where {T}  = similar(a, T, d)
 function Base.copy(a::PetscMat{T}) where {T}
   p = Ref{C.Mat{T}}()
   chk(C.MatDuplicate(a.p, C.MAT_COPY_VALUES, p))
-  Mat{T}(p[])
+  A=Mat{T}(p[])
+  A.verify_assembled = a.verify_assembled
+  A.data             = a.data
+  A.insertmode       = a.insertmode
+  A
 end
 
 """
