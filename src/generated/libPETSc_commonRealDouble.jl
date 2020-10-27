@@ -157,7 +157,7 @@ const PETSC_COMM_SELF = MPI_COMM_SELF
 #= # begin enum PetscDataType =#
 const  PetscDataType = UInt32
 
-const PETSC_INT = (UInt32)(0)
+const PETSC_INT = (UInt32)(16)
 const PETSC_DOUBLE = (UInt32)(1)
 const PETSC_COMPLEX = (UInt32)(2)
 const PETSC_LONG = (UInt32)(3)
@@ -1011,7 +1011,7 @@ const  PetscLogDouble = Cdouble
 #= # begin enum ANONYMOUS_6 =#
 const  ANONYMOUS_6 = UInt32
 
-const PETSC_INT = (UInt32)(0)
+const PETSC_INT = (UInt32)(16)
 const PETSC_DOUBLE = (UInt32)(1)
 const PETSC_COMPLEX = (UInt32)(2)
 const PETSC_LONG = (UInt32)(3)
