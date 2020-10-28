@@ -40,7 +40,7 @@ The keyword options are zero or more of the following:
 
 These control the solver and preconditioner characteristics:
 * `ksp_type="a"`: use KSP algorithm `a`
-* `ksp_pc_side=n`: set preconditioner side to `PETSc.C.PC_LEFT`, `PETSc.C.PC_RIGHT`, or `PETSc.C.PC_SYMMETRIC`
+* `ksp_pc_side=n`: set preconditioner side to `GridapDistributedPETScWrappers.C.PC_LEFT`, `GridapDistributedPETScWrappers.C.PC_RIGHT`, or `GridapDistributedPETScWrappers.C.PC_SYMMETRIC`
 * `ksp_reuse_preconditioner=true`: use initial preconditioner and don't ever compute a new one
 * `ksp_diagonal_scale=true`: symmetrically diagonally scale `A` before solving (note that this *changes* `A` and the right-hand side in a solve, unless you also set `ksp_diagonal_scale_fix=true`)
 * `ksp_diagonal_scale_fix=true`: undo diagonal scaling after solve
@@ -59,7 +59,7 @@ iterative solvers:
 * `ksp_converged_use_min_initial_residual_norm=true`: use min of initial residual norm and `b` for computing relative convergence
 * `ksp_error_if_not_converged=true`: generate error if solver does not converge
 * `ksp_convergence_test=:default` or `:skip`: use the default convergence test (tolerances and `max_it`) or skip convergence tests and run until `max_it` is reached
-* `ksp_norm_type=n`: in residual tests, use norm type `n`, one of default (`PETSc.C.KSP_NORM_DEFAULT`), none (`PETSc.C.KSP_NORM_NONE`), of the preconditioned residual (`PETSc.C.KSP_NORM_PRECONDITIONED`), the true residual (`PETSc.C.KSP_NORM_UNPRECONDITIONED`), or the "natural" norm (`PETSc.C.KSP_NORM_NATURAL`)
+* `ksp_norm_type=n`: in residual tests, use norm type `n`, one of default (`GridapDistributedPETScWrappers.C.KSP_NORM_DEFAULT`), none (`GridapDistributedPETScWrappers.C.KSP_NORM_NONE`), of the preconditioned residual (`GridapDistributedPETScWrappers.C.KSP_NORM_PRECONDITIONED`), the true residual (`GridapDistributedPETScWrappers.C.KSP_NORM_UNPRECONDITIONED`), or the "natural" norm (`GridapDistributedPETScWrappers.C.KSP_NORM_NATURAL`)
 * `ksp_check_norm_iteration=n`: compute residual norm starting on iteration `n`
 * `ksp_lag_norm=true`: lag the calculation of the residual norm by one iteration (trades off reduced communication for an additional iteration)
 

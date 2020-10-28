@@ -1,4 +1,4 @@
-module PETSc
+module GridapDistributedPETScWrappers
 
 import MPI
 export PetscInt

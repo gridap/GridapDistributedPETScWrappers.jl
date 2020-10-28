@@ -10,7 +10,7 @@ export PetscBool
 export PetscInt
 export have_petsc, petsc_libs, petsc_type
 const depfile = joinpath(dirname(@__FILE__), "..", "..", "deps", "deps.jl")
-isfile(depfile) || error("PETSc not properly installed. Please run Pkg.build(\"PETSc\")")
+isfile(depfile) || error("GridapDistributedPETScWrappers not properly installed. Please run Pkg.build(\"GridapDistributedPETScWrappers\")")
 include(depfile)
 
 if (deps_file_petscRealDouble == "")

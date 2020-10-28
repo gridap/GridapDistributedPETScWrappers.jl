@@ -1,5 +1,5 @@
-using PETSc
-using PETSc.C
+using GridapDistributedPETScWrappers
+using GridapDistributedPETScWrappers.C
 using MPI
 using LinearAlgebra
 using SparseArrays
@@ -48,7 +48,7 @@ function RT(x::Number)
 
 end
 
-function mymult(A::PETSc.C.Mat{T}, x::PETSc.C.Vec, b::PETSc.C.Vec) where {T}
+function mymult(A::GridapDistributedPETScWrappers.C.Mat{T}, x::GridapDistributedPETScWrappers.C.Vec, b::GridapDistributedPETScWrappers.C.Vec) where {T}
 # matrix multiplication function for the shell matrix A
 # A performs the action of A = diagm(1:sys_size)
 
@@ -62,5 +62,5 @@ function mymult(A::PETSc.C.Mat{T}, x::PETSc.C.Vec, b::PETSc.C.Vec) where {T}
 
   restore(localx)
   restore(localb)
-  return PETSc.C.PetscErrorCode(0)
+  return GridapDistributedPETScWrappers.C.PetscErrorCode(0)
 end

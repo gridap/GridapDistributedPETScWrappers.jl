@@ -1,7 +1,7 @@
 # create Vec
 @testset "Vec{$ST}" begin
-  vtype = PETSc.C.VECMPI
-  vec = PETSc.Vec(ST, vtype)
+  vtype = GridapDistributedPETScWrappers.C.VECMPI
+  vec = GridapDistributedPETScWrappers.Vec(ST, vtype)
   resize!(vec, 4)
   @test_throws ArgumentError resize!(vec)
   len_ret = length(vec)
@@ -10,7 +10,7 @@
   @test size(vec) == (4,)
   @test lengthlocal(vec) == 4
   @test sizelocal(vec) == (4,)
-  @test PETSc.gettype(vec) == PETSc.C.VECMPI
+  @test GridapDistributedPETScWrappers.gettype(vec) == GridapDistributedPETScWrappers.C.VECMPI
 
 
   vt = complex(2.,2)  # use vt to hold temporary values
@@ -19,23 +19,23 @@
   @test vec[1] == RC(vt)
 
   vec2 = similar(vec,ST)
-  PETSc.AssemblyBegin(vec2)
-  PETSc.AssemblyEnd(vec2)
+  GridapDistributedPETScWrappers.AssemblyBegin(vec2)
+  GridapDistributedPETScWrappers.AssemblyEnd(vec2)
 
   @test isassembled(vec2)
   val2_ret = vec2[1]
 
   @test val2_ret != val_ret
 
-  if gettype(vec2) == PETSc.C.VECSEQ
+  if gettype(vec2) == GridapDistributedPETScWrappers.C.VECSEQ
     lv2 = localpart(vec2)
     @test lv2 == vec2
   end
 
   vec_tmp = Vec([1., 2, 3])
-  @test PETSc.isfinalized(vec_tmp) == false
-  PETSc.PetscDestroy(vec_tmp)
-  @test PETSc.isfinalized(vec_tmp) == true
+  @test GridapDistributedPETScWrappers.isfinalized(vec_tmp) == false
+  GridapDistributedPETScWrappers.PetscDestroy(vec_tmp)
+  @test GridapDistributedPETScWrappers.isfinalized(vec_tmp) == true
 
   vec3 = similar(vec, ST, 5)
   @test length(vec3) == 5
@@ -164,10 +164,10 @@
       log!(vec4)
       @test vec4 ≈ vec4_j
     end
-    onevec = PETSc.Vec(ST, vtype)
+    onevec = GridapDistributedPETScWrappers.Vec(ST, vtype)
     resize!(onevec, 4)
-    PETSc.AssemblyBegin(onevec)
-    PETSc.AssemblyEnd(onevec)
+    GridapDistributedPETScWrappers.AssemblyBegin(onevec)
+    GridapDistributedPETScWrappers.AssemblyEnd(onevec)
     for i=1:length(onevec)
         onevec[i] = one(ST)
     end
@@ -176,7 +176,7 @@
       @test_throws ArgumentError norm(onevec,3)
       @test norm(onevec,Inf) == 1
       normvec = copy(onevec)
-      PETSc.normalize!(normvec)
+      GridapDistributedPETScWrappers.normalize!(normvec)
       @test norm(normvec,2) == one(ST)
     end
     if ST <: Real
@@ -294,7 +294,7 @@
       @test vec4j == vec4
     end
     @testset "testing .*, ./, .^" begin
-      vec5 = Vec(ST, 3, vtype=PETSc.C.VECMPI)
+      vec5 = Vec(ST, 3, vtype=GridapDistributedPETScWrappers.C.VECMPI)
       vec6 = similar(vec5)
       vec5j = zeros(ST, 3)
       vec6j = zeros(ST, 3)

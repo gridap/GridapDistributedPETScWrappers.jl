@@ -1,5 +1,6 @@
-name = "PETSc"
+name = "GridapDistributedPETScWrappers"
 uuid = "743b6f9b-fae8-55fc-a981-4e9a2885e829"
+authors = ["Alberto F. Martin <alberto.martin@monash.edu>"]
 version = "0.1.0"
 
 [deps]

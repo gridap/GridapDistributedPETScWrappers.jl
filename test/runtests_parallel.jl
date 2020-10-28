@@ -6,15 +6,15 @@ global const comm_size = MPI.Comm_size(MPI.COMM_WORLD)
 global const comm_rank = MPI.Comm_rank(MPI.COMM_WORLD)
 
 # size of the system owned by this process (ie. local sys size)
-sys_size = PETSc.C.PetscInt(3)
+sys_size = GridapDistributedPETScWrappers.C.PetscInt(3)
 
 # create a 3x3 block for each process
 # create these with smallest precision, so they can be promoted
 tmp3 = convert(Array{ComplexF64, 1}, [1.0 + 0im; 2.0 + 1.0im; 3.0 + 2.0im])
 tmp4 = convert( Array{ComplexF64, 2}, [1.0 + 1im   2 + 2im  3 + 3im; 4 + 4im  5 + 5im 7 + 7im; 7 + 7im 8 + 8im 9 + 9im])
 
-for (i, ST) in enumerate(PETSc.C.petsc_type)
-  if PETSc.have_petsc[i]
+for (i, ST) in enumerate(GridapDistributedPETScWrappers.C.petsc_type)
+  if GridapDistributedPETScWrappers.have_petsc[i]
     # @testset "Scalar type $ST" begin # uncomment when nested test results can be printed
 
     # Have both local and global versions of system for testing
