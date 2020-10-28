@@ -4,18 +4,18 @@ export Vec, comm, NullVec
  """
   Construct a high level Vec object from a low level C.Vec.
   The data field is used to protect things from GC.
-  A finalizer is attached to deallocate the memory of the underlying C.Vec, unless 
+  A finalizer is attached to deallocate the memory of the underlying C.Vec, unless
   `first_instance` is set to true.
   `assembled` indicates when values are set via `setindex!` and is reset by
    `AssemblyEnd`
    `verify_assembled` when true, calls to `isassembled` verify all processes
-   have `assembled` = true, when false, only the local assembly state is 
-   checked.  This essentially makes the user responsible for assembling 
+   have `assembled` = true, when false, only the local assembly state is
+   checked.  This essentially makes the user responsible for assembling
   the vector before passing it into functions that will use it (like KSP
   solves, etc.).
 
 """
-type Vec{T} <: AbstractVector{T}
+mutable struct Vec{T} <: AbstractVector{T}
   p::C.Vec{T}
   assembled::Bool # whether are all values have been assembled
   verify_assembled::Bool # check whether all processes are assembled
@@ -23,22 +23,20 @@ type Vec{T} <: AbstractVector{T}
   data::Any # keep a reference to anything needed for the Mat
             # -- needed if the Mat is a wrapper around a Julia object,
             #    to prevent the object from being garbage collected.
-  function Vec(p::C.Vec{T}, data=nothing; first_instance::Bool=true, 
-               verify_assembled::Bool=true)
-    v = new(p, false, verify_assembled, C.INSERT_VALUES, data)
+  function Vec{T}(p::C.Vec{T}, data=nothing; first_instance::Bool=true,
+               verify_assembled::Bool=true) where {T}
+    v = new{T}(p, false, verify_assembled, C.INSERT_VALUES, data)
     if first_instance
-      finalizer(v, PetscDestroy)
+      finalizer(PetscDestroy,v)
     end
     return v
   end
 end
 
-import Base: show, showcompact, writemime
-function show(io::IO, x::Vec)
-
+function Base.show(io::IO, x::Vec)
   myrank = MPI.Comm_rank(comm(x))
   if myrank == 0
-    println("Petsc Vec of lenth ", length(x))
+    println("Petsc Vec of length ", length(x))
   end
   if isassembled(x)
     println(io, "Process ", myrank, " entries:")
@@ -49,10 +47,6 @@ function show(io::IO, x::Vec)
     println(io, "Process ", myrank, " not assembled")
   end
 end
-
-
-showcompact(io::IO, x::Vec) = show(io, x)
-writemime(io::IO, ::MIME"text/plain", x::Vec) = show(io, x)
 
 """
   Null vectors, used in place of void pointers in the C
@@ -77,21 +71,18 @@ end
  """
   Gets the MPI communicator of a vector.
 """
-function comm{T}(v::Vec{T})
-  rcomm = Ref{MPI.CComm}()
-  ccomm = C.PetscObjectComm(T, v.p.pobj)
-  fcomm = convert(MPI.Comm, ccomm)
-  return fcomm
+function comm(v::Vec{T}) where {T}
+  return C.PetscObjectComm(T, v.p.pobj)
 end
 
 
 export gettype
 
  """
-  Get the symbol that is the format of the vector
+  Get the Symbol that is the format of the vector
 """
-function gettype{T}(a::Vec{T})
-  sym_arr = Array(C.VecType, 1)
+function gettype(a::Vec{T}) where {T}
+  sym_arr = Array{C.VecType}(undef,1)
   chk(C.VecGetType(a.p, sym_arr))
   return sym_arr[1]
 end
@@ -100,25 +91,25 @@ end
  """
   Create an empty, unsized vector.
 """
-function Vec{T}(::Type{T}, vtype::C.VecType=C.VECMPI;
-                comm::MPI.Comm=MPI.COMM_WORLD)
+function Vec(::Type{T}, vtype::C.VecType=C.VECMPI;
+                comm::MPI.Comm=MPI.COMM_WORLD) where {T}
   p = Ref{C.Vec{T}}()
   chk(C.VecCreate(comm, p))
-  chk(C.VecSetType(p[], vtype)) 
+  chk(C.VecSetType(p[], vtype))
   v = Vec{T}(p[])
   v
 end
 
  """
   Create a vector, specifying the (global) length len or the local length
-  mlocal.  Even if the blocksize is > 1, teh lengths are always number of 
+  mlocal.  Even if the blocksize is > 1, teh lengths are always number of
   elements in the vector, not number of block elements.  Thus
   len % blocksize must = 0.
 """
-function Vec{T<:Scalar}(::Type{T}, len::Integer=C.PETSC_DECIDE;
+function Vec(::Type{T}, len::Integer=C.PETSC_DECIDE;
                          vtype::C.VecType=C.VECMPI,  bs=1,
-                         comm::MPI.Comm=MPI.COMM_WORLD, 
-                         mlocal::Integer=C.PETSC_DECIDE)
+                         comm::MPI.Comm=MPI.COMM_WORLD,
+                         mlocal::Integer=C.PETSC_DECIDE) where {T<:Scalar}
   vec = Vec(T, vtype; comm=comm)
   resize!(vec, len, mlocal=mlocal)
   set_block_size(vec, bs)
@@ -130,18 +121,18 @@ end
   the local part of the PETSc vector
 """
 # make a Vec that is a wrapper around v, where v stores the local data
-function Vec{T<:Scalar}(v::Vector{T}; comm::MPI.Comm=MPI.COMM_WORLD)
+function Vec(v::Vector{T}; comm::MPI.Comm=MPI.COMM_WORLD) where {T<:Scalar}
   p = Ref{C.Vec{T}}()
-  chk(C.VecCreateMPIWithArray(comm, 1, length(v), C.PETSC_DECIDE, v, p))
+  chk(C.VecCreateMPIWithArray(comm, PetscInt(1), PetscInt(length(v)), PetscInt(C.PETSC_DECIDE), v, p))
   pv = Vec{T}(p[], v)
   return pv
 end
 
-function set_block_size{T<:Scalar}(v::Vec{T}, bs::Integer)
-  chk(C.VecSetBlockSize(v.p, bs))
+function set_block_size(v::Vec{T}, bs::Integer) where {T<:Scalar}
+  chk(C.VecSetBlockSize(v.p, PetscInt(bs)))
 end
 
-function get_blocksize{T<:Scalar}(v::Vec{T})
+function get_blocksize(v::Vec{T}) where {T<:Scalar}
   bs = Ref{PetscInt}()
   chk(C.VecGetBlockSize(v.p, bs))
   return Int(bs[])
@@ -151,24 +142,24 @@ export VecGhost, VecLocal, restore
 
 
  """
-  Make a PETSc vector with space for ghost values.  ghost_idx are the 
+  Make a PETSc vector with space for ghost values.  ghost_idx are the
   global indices that will be copied into the ghost space.
 """
 # making mlocal the position and mglobal the keyword argument is inconsistent
 # with the other Vec constructors, but it makes more sense here
-function VecGhost{T<:Scalar, I <: Integer}(::Type{T}, mlocal::Integer, 
-                  ghost_idx::Array{I,1}; comm=MPI.COMM_WORLD, m=C.PETSC_DECIDE, bs=1, vtype=C.VECMPI)
+function VecGhost(::Type{T}, mlocal::Integer,
+                  ghost_idx::Array{I,1}; comm=MPI.COMM_WORLD, m=C.PETSC_DECIDE, bs=1, vtype=C.VECMPI) where {T<:Scalar, I <: Integer}
 
     nghost = length(ghost_idx)
     ghost_idx2 = [ PetscInt(i -1) for i in ghost_idx]
 
     vref = Ref{C.Vec{T}}()
     if bs == 1
-      chk(C.VecCreateGhost(comm, mlocal, m, nghost, ghost_idx2, vref))
+      chk(C.VecCreateGhost(comm, PetscInt(mlocal), PetscInt(m), PetscInt(nghost), ghost_idx2, vref))
     elseif bs > 1
-      chk(C.VecCreateGhostBlock(comm, bs, mlocal, mlocal, m, nghost, ghost_idx2, vref))
+      chk(C.VecCreateGhostBlock(comm, PetscInt(bs), PetscInt(mlocal), PetscInt(mlocal), PetscInt(m), PetscInt(nghost), ghost_idx2, vref))
     else
-      println(STDERR, "WARNING: unsupported block size requested, bs = ", bs)
+      println(stderr, "WARNING: unsupported block size requested, bs = ", bs)
     end
 
     chk(C.VecSetType(vref[], vtype))
@@ -177,11 +168,11 @@ function VecGhost{T<:Scalar, I <: Integer}(::Type{T}, mlocal::Integer,
 end
 
  """
-  Create a VECSEQ that contains both the local and the ghost values of the 
+  Create a VECSEQ that contains both the local and the ghost values of the
   original vector.  The underlying memory for the orignal and output vectors
   alias.
 """
-function VecLocal{T <:Scalar}( v::Vec{T})
+function VecLocal( v::Vec{T}) where {T<:Scalar}
 
   vref = Ref{C.Vec{T}}()
   chk(C.VecGhostGetLocalForm(v.p, vref))
@@ -194,7 +185,7 @@ end
  """
   Tell Petsc the VecLocal is no longer needed
 """
-function restore{T}(v::Vec{T})
+function restore(v::Vec{T}) where {T}
 
   vp = v.data
   vref = Ref(v.p)
@@ -205,7 +196,7 @@ end
  """
   The Petsc function to deallocate Vec objects
 """
-function PetscDestroy{T}(vec::Vec{T})
+function PetscDestroy(vec::Vec{T}) where {T}
   if !PetscFinalized(T)  && !isfinalized(vec)
     C.VecDestroy(Ref(vec.p))
     vec.p = C.Vec{T}(C_NULL)  # indicate the vector is finalized
@@ -228,7 +219,7 @@ global const is_nullvec = isfinalized  # another name for doing the same check
  """
   Use the PETSc routine for printing a vector to stdout
 """
-function petscview{T}(vec::Vec{T})
+function petscview(vec::Vec{T}) where {T}
   viewer = C.PetscViewer{T}(C_NULL)
   chk(C.VecView(vec.p, viewer))
 end
@@ -237,8 +228,7 @@ function Base.resize!(x::Vec, m::Integer=C.PETSC_DECIDE; mlocal::Integer=C.PETSC
   if m == mlocal == C.PETSC_DECIDE
     throw(ArgumentError("either the length (m) or local length (mlocal) must be specified"))
   end
-
-  chk(C.VecSetSizes(x.p, mlocal, m))
+  chk(C.VecSetSizes(x.p, PetscInt(mlocal), PetscInt(m)))
   x
 end
 
@@ -249,8 +239,8 @@ export ghost_begin!, ghost_end!, scatter!, ghost_update!
   Start communication to update the ghost values (on other processes) from the local
   values
 """
-function ghost_begin!{T<:Scalar}(v::Vec{T}; imode=C.INSERT_VALUES,
-                               smode=C.SCATTER_FORWARD)
+function ghost_begin!(v::Vec{T}; imode=C.INSERT_VALUES,
+                               smode=C.SCATTER_FORWARD) where {T<:Scalar}
     chk(C.VecGhostUpdateBegin(v.p, imode, smode))
     return v
 end
@@ -258,8 +248,8 @@ end
  """
   Finish communication for updating ghost values
 """
-function ghost_end!{T<:Scalar}(v::Vec{T}; imode=C.INSERT_VALUES,
-                               smode=C.SCATTER_FORWARD)
+function ghost_end!(v::Vec{T}; imode=C.INSERT_VALUES,
+                               smode=C.SCATTER_FORWARD) where {T<:Scalar}
     chk(C.VecGhostUpdateEnd(v.p, imode, smode))
     return v
 end
@@ -268,7 +258,7 @@ end
  """
   Convenience method for calling both ghost_begin! and ghost_end!
 """
-function scatter!{T<:Scalar}(v::Vec{T}; imode=C.INSERT_VALUES, smode=C.SCATTER_FORWARD)
+function scatter!(v::Vec{T}; imode=C.INSERT_VALUES, smode=C.SCATTER_FORWARD) where {T<:Scalar}
 
   ghost_begin!(v, imode=imode, smode=smode)
   ghost_end!(v, imode=imode, smode=smode)
@@ -331,12 +321,12 @@ sizelocal(x::Vec) = (lengthlocal(x),)
 """
   Get local size of the vector
 """
-sizelocal{T,n}(t::AbstractArray{T,n}, d) = (d>n ? 1 : sizelocal(t)[d])
+sizelocal(t::AbstractArray{T,n}, d) where {T,n} = (d>n ? 1 : sizelocal(t)[d])
 
  """
   Get the range of global indices that define the local part of the vector.
   Internally, this calls the Petsc function VecGetOwnershipRange, and has
-  the same limitations as that function, namely that some vector formats do 
+  the same limitations as that function, namely that some vector formats do
   not have a well defined contiguous range.
 """
 function localpart(v::Vec)
@@ -364,27 +354,30 @@ function localpart_block(v::Vec)
 end
 
 
-function Base.similar{T}(x::Vec{T})
+function Base.similar(x::Vec{T}) where {T}
   p = Ref{C.Vec{T}}()
   chk(C.VecDuplicate(x.p, p))
-  Vec{T}(p[])
+  v=Vec{T}(p[])
+  v.assembled        = x.assembled
+  v.verify_assembled = x.verify_assembled
+  v.data             = x.data
+  v.insertmode       = x.insertmode
+  v
 end
 
-Base.similar{T}(x::Vec{T}, ::Type{T}) = similar(x)
-function Base.similar{T}(x::Vec{T}, T2::Type)
+Base.similar(x::Vec{T}, ::Type{T}) where {T} = similar(x)
+function Base.similar(x::Vec{T}, T2::Type) where {T}
   VType = gettype(x)
   Vec(T2, length(x), VType; comm=comm(x), mlocal=lengthlocal(x))
 end
 
-function Base.similar{T}(x::Vec{T}, T2::Type, len::Union{Int,Dims})
+function Base.similar(x::Vec{T}, T2::Type, len::Union{Int,Dims{1}}) where {T}
   VType = gettype(x)
-  length(len) == 1 || throw(ArgumentError("expecting 1-dimensional size"))
   len[1]==length(x) && T2==T ? similar(x) : Vec(T2, len[1], vtype=VType; comm=comm(x))
 end
 
-function Base.similar{T}(x::Vec{T}, len::Union{Int,Dims})
+function Base.similar(x::Vec{T}, len::Union{Int,Dims{1}}) where {T}
   VType = gettype(x)
-  length(len) == 1 || throw(ArgumentError("expecting 1-dimensional size"))
   len[1]==length(x) ? similar(x) : Vec(T, len[1], vtype=VType; comm=comm(x))
 end
 
@@ -396,14 +389,19 @@ function Base.copy(x::Vec)
   y
 end
 
+function Base.copy!(dst::Vec,src::Vec)
+  chk(C.VecCopy(src.p, dst.p))
+end
+
+
 ###############################################################################
 export localIS, local_to_global_mapping, set_local_to_global_mapping, has_local_to_global_mapping
 
 """
-  Constructs index set mapping from local indexing to global indexing, based 
+  Constructs index set mapping from local indexing to global indexing, based
   on localpart()
 """
-function localIS{T}(A::Vec{T})
+function localIS(A::Vec{T}) where {T}
 
   rows = localpart(A)
   rowis = IS(T, rows, comm=comm(A))
@@ -413,7 +411,7 @@ end
 """
   Like localIS, but returns a block index IS
 """
-function localIS_block{T}(A::Vec{T})
+function localIS_block(A::Vec{T}) where {T}
   rows = localpart_block(A)
   bs = get_blocksize(A)
   rowis = ISBlock(T, bs, rows, comm=comm(A))
@@ -421,7 +419,7 @@ function localIS_block{T}(A::Vec{T})
   return rowis
 end
 """
-  Construct ISLocalToGlobalMappings for the vector.  If a block vector, 
+  Construct ISLocalToGlobalMappings for the vector.  If a block vector,
   create a block index set
 """
 function local_to_global_mapping(A::Vec)
@@ -430,7 +428,7 @@ function local_to_global_mapping(A::Vec)
   # memory
   if get_blocksize(A) == 1
     rowis = localIS(A)
-  else 
+  else
     rowis = localIS_block(A)
   end
   row_ltog = ISLocalToGlobalMapping(rowis)
@@ -442,7 +440,7 @@ end
 """
   Registers the ISLocalToGlobalMapping with the Vec
 """
-function set_local_to_global_mapping{T}(A::Vec{T}, rmap::ISLocalToGlobalMapping{T})
+function set_local_to_global_mapping(A::Vec{T}, rmap::ISLocalToGlobalMapping{T}) where {T}
 
   chk(C.VecSetLocalToGlobalMapping(A.p, rmap.p))
 end
@@ -450,13 +448,13 @@ end
 """
   Check if the local to global mapping has been registered
 """
-function has_local_to_global_mapping{T}(A::Vec{T})
+function has_local_to_global_mapping(A::Vec{T}) where {T}
 
   rmap_ref = Ref{C.ISLocalToGlobalMapping{T}}()
   chk(C.VecGetLocalToGlobalMapping(A.p, rmap_re))
 
   rmap = rmap_ref[]
-  
+
   return rmap.pobj != C_NULL
 end
 
@@ -470,10 +468,10 @@ export assemble, isassembled, AssemblyBegin, AssemblyEnd
  """
   Start communication to assemble stashed values into the vector
 
-  The MatAssemblyType is not needed for vectors, but is provided for 
-  compatability with the Mat case.
+  The MatAssemblyType is not needed for vectors, but is provided for
+  compatibility with the Mat case.
 
-  Unless vec.verify_assembled == false, users must *never* call the 
+  Unless vec.verify_assembled == false, users must *never* call the
   C functions VecAssemblyBegin, VecAssemblyEnd and VecSetValues, they must
   call AssemblyBegin, AssemblyEnd, and setindex!.
 """
@@ -496,9 +494,9 @@ function AssemblyEnd(x::Vec, t::C.MatAssemblyType=C.MAT_FINAL_ASSEMBLY)
 end
 
 """
-  Check if a vector is assembled (ie. does not have stashed values).  If 
-  `x.verify_assembled`, the assembly state of all processes is checked, 
-  otherwise only the local process is checked. `local_only` forces only 
+  Check if a vector is assembled (ie. does not have stashed values).  If
+  `x.verify_assembled`, the assembly state of all processes is checked,
+  otherwise only the local process is checked. `local_only` forces only
   the local process to be checked, regardless of `x.verify_assembled`.
 """
 function isassembled(x::Vec, local_only=false)
@@ -525,48 +523,48 @@ isassemble(x::AbstractArray) = true
  """
   Like setindex, but requires the indices be 0-base
 """
-function setindex0!{T}(x::Vec{T}, v::Array{T}, i::Array{PetscInt})
+function setindex0!(x::Vec{T}, v::Array{T}, i::Array{PetscInt}) where {T}
   n = length(v)
   if n != length(i)
     throw(ArgumentError("length(values) != length(indices)"))
   end
   #    println("  in setindex0, passed bounds check")
-  chk(C.VecSetValues(x.p, n, i, v, x.insertmode))
+  chk(C.VecSetValues(x.p, PetscInt(n), i, v, x.insertmode))
   x.assembled = false
   x
 end
 
-function setindex!{T}(x::Vec{T}, v::Number, i::Integer)
+function setindex!(x::Vec{T}, v::Number, i::Integer) where {T}
   # can't call VecSetValue since that is a static inline function
   setindex0!(x, T[ v ], PetscInt[ i - 1 ])
   v
 end
 
 # set multiple entries to a single value
-setindex!{T<:Integer}(x::Vec, v::Number, I::AbstractArray{T}) = assemble(x) do
+setindex!(x::Vec, v::Number, I::AbstractArray{T}) where {T<:Integer} = assemble(x) do
   for i in I
     x[i] = v
   end
   x
 end
 
-function Base.fill!{T}(x::Vec{T}, v::Number)
+function Base.fill!(x::Vec{T}, v::Number) where {T}
   chk(C.VecSet(x.p, T(v)))
   return x
 end
 
-function setindex!{T<:Integer}(x::Vec, v::Number, I::Range{T})
+function setindex!(x::Vec, v::Number, I::AbstractRange{T}) where {T<:Integer}
   if abs(step(I)) == 1 && minimum(I) == 1 && maximum(I) == length(x)
     fill!(x, v)
     return v
   else
     # use invoke here to avoid a recursion loop
-    return invoke(setindex!, (Vec,typeof(v),AbstractVector{T}), x,v,I)
+    return invoke(setindex!, Tuple{Vec,typeof(v),AbstractVector{T}}, x,v,I)
   end
 end
 
 #TODO: make this a single call to VecSetValues
-setindex!{T<:Real}(x::Vec, V::AbstractArray, I::AbstractArray{T}) =
+setindex!(x::Vec, V::AbstractArray, I::AbstractArray{T}) where {T<:Real} =
 assemble(x) do
   if length(V) != length(I)
     throw(ArgumentError("length(values) != length(indices)"))
@@ -591,7 +589,7 @@ setindex!(A::Vec, x::Number, I::AbstractArray{Bool}) = assemble(A) do
   A
 end
 for T in (:(Array{T2}),:(AbstractArray{T2})) # avoid method ambiguities
-  @eval setindex!{T2<:Scalar}(A::Vec, X::$T, I::AbstractArray{Bool}) = assemble(A) do
+  @eval setindex!(A::Vec, X::$T, I::AbstractArray{Bool}) where {T2<:Scalar} = assemble(A) do
     c = 1
     for i = 1:length(I)
       if I[i]
@@ -607,9 +605,9 @@ end
 import Base.getindex
 
 # like getindex but for 0-based indices i
-function getindex0{T}(x::Vec{T}, i::Vector{PetscInt})
+function getindex0(x::Vec{T}, i::Vector{PetscInt}) where {T}
   v = similar(i, T)
-  chk(C.VecGetValues(x.p, length(i), i, v))
+  chk(C.VecGetValues(x.p, PetscInt(length(i)), i, v))
   v
 end
 
@@ -625,14 +623,14 @@ export set_values!, set_values_blocked!, set_values_local!, set_values_blocked_l
 
 #TODO: in 0.5, use boundscheck macro to verify stride=1
 
-function set_values!{T <: Scalar}(x::Vec{T}, idxs::StridedVecOrMat{PetscInt}, 
-                                 vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode)
+function set_values!(x::Vec{T}, idxs::StridedVecOrMat{PetscInt},
+                                 vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
-  chk(C.VecSetValues(x.p, length(idxs), idxs, vals, o))
+  chk(C.VecSetValues(x.p, PetscInt(length(idxs)), idxs, vals, o))
 end
 
-function set_values!{T <: Scalar, I <: Integer}(x::Vec{T}, idxs::StridedVecOrMat{I},
-                                         vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode)
+function set_values!(x::Vec{T}, idxs::StridedVecOrMat{I},
+                                         vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar, I <: Integer}
 
   # convert idxs to PetscInt
   p_idxs = PetscInt[ i for i in idxs]
@@ -656,16 +654,16 @@ function set_values!(x::AbstractVector, idxs::AbstractArray, vals::AbstractArray
 end
 
 
-function set_values_blocked!{T <: Scalar}(x::Vec{T}, idxs::StridedVecOrMat{PetscInt},
-                                          vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode)
+function set_values_blocked!(x::Vec{T}, idxs::StridedVecOrMat{PetscInt},
+                                          vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
-  chk(C.VecSetValuesBlocked(x.p, length(idxs), idxs, vals, o))
+  chk(C.VecSetValuesBlocked(x.p, PetscInt(length(idxs)), idxs, vals, o))
 end
 
-function set_values_blocked!{T <: Scalar, I <: Integer}(x::Vec{T}, 
-                             idxs::StridedVecOrMat{I}, vals::StridedVecOrMat{T}, 
-                             o::C.InsertMode=x.insertmode)
- 
+function set_values_blocked!(x::Vec{T},
+                             idxs::StridedVecOrMat{I}, vals::StridedVecOrMat{T},
+                             o::C.InsertMode=x.insertmode) where {T <: Scalar, I <: Integer}
+
   p_idxs = PetscInt[ i for i in idxs]
   set_values_blocked!(x, p_idxs, vals, o)
 end
@@ -673,22 +671,22 @@ end
 # julia doesn't have blocked vectors, so skip
 
 
-function set_values_local!{T <: Scalar}(x::Vec{T}, idxs::StridedVecOrMat{PetscInt},
-                                       vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode)
+function set_values_local!(x::Vec{T}, idxs::StridedVecOrMat{PetscInt},
+                                       vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
-  chk(C.VecSetValuesLocal(x.p, length(idxs), idxs, vals, o))
+  chk(C.VecSetValuesLocal(x.p, PetscInt(length(idxs)), idxs, vals, o))
 end
 
-function set_values_local!{T <: Scalar, I <: Integer}(x::Vec{T}, 
-                           idxs::StridedVecOrMat{I}, vals::StridedVecOrMat{T}, 
-                           o::C.InsertMode=x.insertmode)
+function set_values_local!(x::Vec{T},
+                           idxs::StridedVecOrMat{I}, vals::StridedVecOrMat{T},
+                           o::C.InsertMode=x.insertmode) where {T <: Scalar, I <: Integer}
 
   p_idxs = PetscInt[ i for i in idxs]
   set_values_local!(x, p_idxs, vals, o)
 end
 
 # for julia vectors, local = global
-function set_values_local!(x::AbstractArray, idxs::AbstractArray, 
+function set_values_local!(x::AbstractArray, idxs::AbstractArray,
                            vals::AbstractArray, o::C.InsertMode=C.INSERT_VALUES)
 
   if o == C.INSERT_VALUES
@@ -706,17 +704,17 @@ function set_values_local!(x::AbstractArray, idxs::AbstractArray,
 end
 
 
-function set_values_blocked_local!{T <: Scalar}(x::Vec{T}, 
+function set_values_blocked_local!(x::Vec{T},
                                    idxs::StridedVecOrMat{PetscInt},
-                                   vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode)
+                                   vals::StridedVecOrMat{T}, o::C.InsertMode=x.insertmode) where {T <: Scalar}
 
-  chk(C.VecSetValuesBlockedLocal(x.p, length(idxs), idxs, vals, o))
+  chk(C.VecSetValuesBlockedLocal(x.p, PetscInt(length(idxs)), idxs, vals, o))
 end
 
 
-function set_values_blocked_local!{T <: Scalar, I <: Integer}(x::Vec{T}, 
-                           idxs::StridedVecOrMat{I}, vals::StridedVecOrMat{T}, 
-                           o::C.InsertMode=x.insertmode)
+function set_values_blocked_local!(x::Vec{T},
+                           idxs::StridedVecOrMat{I}, vals::StridedVecOrMat{T},
+                           o::C.InsertMode=x.insertmode) where {T <: Scalar, I <: Integer}
 
   p_idxs = PetscInt[ i for i in idxs]
   set_values_blocked_local!(x, p_idxs, vals, o)
@@ -728,14 +726,14 @@ end
 
 
 
-                             
+
 
 ###############################################################################
 import Base: abs, exp, log, conj, conj!
 export abs!, exp!, log!
 for (f,pf) in ((:abs,:VecAbs), (:exp,:VecExp), (:log,:VecLog),
   (:conj,:VecConjugate))
-  fb = symbol(string(f, "!"))
+  fb = Symbol(string(f, "!"))
   @eval begin
     function $fb(x::Vec)
       chk(C.$pf(x.p))
@@ -754,19 +752,18 @@ end
 
 for (f, pf, sf) in ((:findmax, :VecMax, :maximum), (:findmin, :VecMin, :minimum))
   @eval begin
-    function Base.$f{T<:Real}(x::Vec{T})
+    function Base.$f(x::Vec{T}) where {T<:Real}
       i = Ref{PetscInt}()
       v = Ref{T}()
       chk(C.$pf(x.p, i, v))
       (v[], i[]+1)
     end
-    Base.$sf{T<:Real}(x::Vec{T}) = $f(x)[1]
+    Base.$sf(x::Vec{T}) where {T<:Real} = $f(x)[1]
   end
 end
 # For complex numbers, VecMax and VecMin apparently return the max/min
 # real parts, which doesn't match Julia's maximum/minimum semantics.
-
-function Base.norm{T<:Real}(x::Union{Vec{T},Vec{Complex{T}}}, p::Number)
+function LinearAlgebra.norm(x::Union{Vec{T},Vec{Complex{T}}}, p::Real) where {T<:Real}
   v = Ref{T}()
   n = p == 1 ? C.NORM_1 : p == 2 ? C.NORM_2 : p == Inf ? C.NORM_INFINITY :
   throw(ArgumentError("unrecognized Petsc norm $p"))
@@ -774,56 +771,57 @@ function Base.norm{T<:Real}(x::Union{Vec{T},Vec{Complex{T}}}, p::Number)
   v[]
 end
 
-if VERSION >= v"0.5.0-dev+8353" # JuliaLang/julia#13681
-  import Base.normalize!
-else
-  export normalize!
-end
+#if VERSION >= v"0.5.0-dev+8353" # JuliaLang/julia#13681
+#  import Base.normalize!
+#else
+#  export normalize!
+#end
 
  """
   computes v = norm(x,2), divides x by v, and returns v
 """
-function normalize!{T<:Real}(x::Union{Vec{T},Vec{Complex{T}}})
-  v = Ref{T}()
-  chk(C.VecNormalize(x.p, v))
-  v[]
-end
+#function normalize!(x::Union{Vec{T},Vec{Complex{T}}}) where {T<:Real}
+#  v = Ref{T}()
+#  chk(C.VecNormalize(x.p, v))
+#  v[]
+#end
 
-function Base.dot{T}(x::Vec{T}, y::Vec{T})
+function LinearAlgebra.dot(x::Vec{T}, y::Vec{T}) where {T}
   d = Ref{T}()
   chk(C.VecDot(y.p, x.p, d))
   return d[]
 end
 
 # unconjugated dot product (called for x'*y)
-function Base.At_mul_B{T<:Complex}(x::Vec{T}, y::Vec{T})
-  d = Array(T, 1)
-  chk(C.VecTDot(x.p, y.p, d))
-  return d
-end
+#function LinearAlgebra.At_mul_B(x::Vec{T}, y::Vec{T}) where {T<:Complex}
+#  d = Array(1)
+#  chk(C.VecTDot(x.p, y.p, d))
+#  return d
+#end
 
 # pointwise operations on pairs of vectors (TODO: support in-place variants?)
-import Base: max, min, .*, ./, .\
-for (f,pf) in ((:max,:VecPointwiseMax), (:min,:VecPointwiseMin),
-  (:.*,:VecPointwiseMult), (:./,:VecPointwiseDivide))
-  @eval function ($f)(x::Vec, y::Vec)
-    w = similar(x)
-    chk(C.$pf(w.p, x.p, y.p))
-    w
-  end
-end
+import Base: broadcast
+#for (f,pf) in ((:max,:VecPointwiseMax), (:min,:VecPointwiseMin),
+#  (:.*,:VecPointwiseMult), (:./,:VecPointwiseDivide))
+#  @eval function broadcast(::typeof($f), x::Vec, y::Vec)
+#    w = similar(x)
+#    chk(C.$pf(w.p, x.p, y.p))
+#    w
+#  end
+#end
 
-import Base: +, -
-function Base.scale!{T}(x::Vec{T}, s::Number)
+import Base: +, -, *, /, \
+export scale!
+function scale!(x::Vec{T}, s::Number) where {T}
   chk(C.VecScale(x.p, T(s)))
   x
 end
-Base.scale{T}(x::Vec{T},s::Number) = scale!(copy(x),s)
-(.*)(x::Vec, a::Number...) = scale(x, prod(a))
-(.*)(a::Number, x::Vec) = scale(x, a)
-(./)(x::Vec, a::Number) = scale(x, inv(a))
-(.\)(a::Number, x::Vec) = scale(x, inv(a))
-function (./)(a::Number, x::Vec)
+scale(x::Vec{T},s::Number) where {T} = scale!(copy(x),s)
+(*)(x::Vec, a::Number...) = scale(x, prod(a))
+(*)(a::Number, x::Vec) = scale(x, a)
+(/)(x::Vec, a::Number) = scale(x, inv(a))
+(\)(a::Number, x::Vec) = scale(x, inv(a))
+function Base.broadcast(::typeof(/), a::Number, x::Vec)
   y = copy(x)
   chk(C.VecReciprocal(y.p))
   if a != 1.0
@@ -832,15 +830,15 @@ function (./)(a::Number, x::Vec)
   y
 end
 
-function (+){T<:Scalar}(x::Vec{T}, a::Number...)
+function (+)(x::Vec{T}, a::Number...) where {T<:Scalar}
   y = copy(x)
   chk(C.VecShift(y.p, T(sum(a))))
   return y
 end
-(+){T<:Scalar}(a::Number, x::Vec{T}) = x + a
-(-){T<:Scalar}(x::Vec{T}, a::Number) = x + (-a)
+(+)(a::Number, x::Vec{T}) where {T<:Scalar} = x + a
+(-)(x::Vec{T}, a::Number) where {T<:Scalar} = x + (-a)
 (-)(x::Vec) = scale(x, -1)
-function (-){T<:Scalar}(a::Number, x::Vec{T})
+function (-)(a::Number, x::Vec{T}) where {T<:Scalar}
   y = -x
   chk(C.VecShift(y.p, T(a)))
   return y
@@ -855,7 +853,7 @@ end
 
 function (==)(x::Vec, y::AbstractArray)
   flag = true
-  x_arr = LocalVector(x) 
+  x_arr = LocalVector(x)
   for i=1:length(x_arr)  # do localpart, then MPI reduce
     flag = flag && x_arr[i] == y[i]
   end
@@ -863,18 +861,18 @@ function (==)(x::Vec, y::AbstractArray)
 
   buf = Int8[flag]
   # process 0 is root
-  recbuf = MPI.Reduce(buf, 1, MPI.LAND, 0, comm(x))
+  recbuf = MPI.Reduce(buf, MPI.LAND, 0, comm(x))
 
   if  MPI.Comm_rank(comm(x)) == 0
     buf[1] = recbuf[1]
   end
 
   MPI.Bcast!(buf, 1, 0, comm(x))
- 
-  return convert(Bool, buf[1]) 
+
+  return convert(Bool, buf[1])
 end
 
-function Base.sum{T}(x::Vec{T})
+function Base.sum(x::Vec{T}) where {T}
   s = Ref{T}()
   chk(C.VecSum(x.p, s))
   s[]
@@ -893,7 +891,7 @@ end
 Applys f element-wise to src to populate dest.  If src is a ghost vector,
 then f is applied to the ghost elements as well as the local elements.
 """
-function map!{T}(f, dest::Vec{T}, src::Vec)
+function map!(f::F, dest::Vec{T}, src::Vec) where {T,F}
   if length(dest) < length(src)
     throw(ArgumentError("Length of dest must be >= src"))
   end
@@ -914,11 +912,11 @@ function map!{T}(f, dest::Vec{T}, src::Vec)
 end
 
 """
-  Multiple source vector map.  All vectors must have the local and global 
+  Multiple source vector map.  All vectors must have the local and global
   lengths.  If some a ghost vectors and some are not, the map is applied
   only to the local part
 """
-function map!{T, T2}(f, dest::Vec{T}, src1::Vec{T}, src2::Vec{T2},  src_rest::Vec{T2}...)
+function map!(f::F, dest::Vec{T}, src1::Vec{T}, src2::Vec{T2},  src_rest::Vec{T2}...) where {F,T,T2}
 
   # annoying workaround for #13651
   srcs = (src1, src2, src_rest...)
@@ -936,16 +934,16 @@ function map!{T, T2}(f, dest::Vec{T}, src1::Vec{T}, src2::Vec{T2},  src_rest::Ve
       throw(ArgumentError("start of local part of src and dest must be aligned"))
     end
   end
-  
+
   # extract the arrays
   n = length(srcs)
   len = 0
   len_prev = 0
-  src_arrs = Array(LocalVectorRead{T2}, n)
+  src_arrs = Array{LocalVectorRead{T2},1}(undef,n)
   use_length_local = false
 
   dest_arr = LocalVector(dest)
-  try 
+  try
     for (idx, src) in enumerate(srcs)
       src_arrs[idx] = LocalVector_readonly(src)
 
@@ -964,7 +962,7 @@ function map!{T, T2}(f, dest::Vec{T}, src1::Vec{T}, src2::Vec{T2},  src_rest::Ve
       min_length = length(src_arrs[1])
     end
       # do the map
-      vals = Array(T, n)
+      vals = Array{T,1}(undef,n)
       for i=1:min_length  # TODO: make this the minimum array length
         for j=1:n  # extract values
           vals[j] = src_arrs[j][i]
@@ -981,59 +979,60 @@ end
 
 ##########################################################################
 export axpy!, aypx!, axpby!, axpbypcz!
-import Base.LinAlg.BLAS.axpy!
+import LinearAlgebra.BLAS.axpy!
+import LinearAlgebra.BLAS.axpby!
 
 # y <- alpha*x + y
-function axpy!{T}(alpha::Number, x::Vec{T}, y::Vec{T})
+function axpy!(alpha::Number, x::Vec{T}, y::Vec{T}) where {T}
   chk(C.VecAXPY(y.p, T(alpha), x.p))
   y
 end
 # w <- alpha*x + y
-function axpy!{T}(alpha::Number, x::Vec{T}, y::Vec{T}, w::Vec{T})
+function axpy!(alpha::Number, x::Vec{T}, y::Vec{T}, w::Vec{T}) where {T}
   chk(C.VecWAXPY(w.p, T(alpha), x.p, y.p))
   y
 end
 # y <- alpha*y + x
-function aypx!{T}(x::Vec{T}, alpha::Number, y::Vec{T})
+function aypx!(x::Vec{T}, alpha::Number, y::Vec{T}) where {T}
   chk(C.VecAYPX( y.p, T(alpha), x.p))
   y
 end
 # y <- alpha*x + beta*y
-function axpby!{T}(alpha::Number, x::Vec{T}, beta::Number, y::Vec{T})
+function axpby!(alpha::Number, x::Vec{T}, beta::Number, y::Vec{T}) where {T}
   chk(C.VecAXPBY(y.p, T(alpha), T(beta), x.p))
   y
 end
 # z <- alpha*x + beta*y + gamma*z
-function axpbypcz!{T}(alpha::Number, x::Vec{T}, beta::Number, y::Vec{T},
-  gamma::Number, z::Vec{T})
+function axpbypcz!(alpha::Number, x::Vec{T}, beta::Number, y::Vec{T},
+  gamma::Number, z::Vec{T}) where {T}
   chk(C.VecAXPBYPCZ(z.p, T(alpha), T(beta), T(gamma), x.p, y.p))
   z
 end
 
 # y <- y + \sum_i alpha[i] * x[i]
-function axpy!{V<:Vec}(y::V, alpha::AbstractArray, x::AbstractArray{V})
+function axpy!(y::V, alpha::AbstractArray, x::AbstractArray{V}) where {V<:Vec}
   n = length(x)
   length(alpha) == n || throw(BoundsError())
   _x = [X.p for X in x]
   _alpha = eltype(y)[a for a in alpha]
-  C.VecMAXPY(y.p, n, _alpha, _x)
+  C.VecMAXPY(y.p, PetscInt(n), _alpha, _x)
   y
 end
 
 ##########################################################################
 # element-wise vector operations:
-import Base: .*, ./, .^, +, -
+# import Base: .*, ./, .^, +, -
 
-for (f,pf) in ((:.*,:VecPointwiseMult), (:./,:VecPointwiseDivide), (:.^,:VecPow))
-  @eval function ($f)(x::Vec, y::Vec)
-    z = similar(x)
-    chk(C.$pf(z.p, x.p, y.p))
-    return z
-  end
-end
+#for (f,pf) in ((:.*,:VecPointwiseMult), (:./,:VecPointwiseDivide), (:.^,:VecPow))
+#  @eval function ($f)(x::Vec, y::Vec)
+#    z = similar(x)
+#    chk(C.$pf(z.p, x.p, y.p))
+#    return z
+#  end
+#end
 
 for (f,s) in ((:+,1), (:-,-1))
-  @eval function ($f){T}(x::Vec{T}, y::Vec{T})
+  @eval function ($f)(x::Vec{T}, y::Vec{T}) where {T}
     z = similar(x)
     chk(C.VecWAXPY(z.p, T($s), y.p, x.p))
     return z
@@ -1048,70 +1047,82 @@ export LocalVector, LocalVector_readonly, restore
   Object representing the local part of the array, accessing the memory directly.
   Supports all the same indexing as a regular Array
 """
-type LocalVector{T <: Scalar, ReadOnly} <: DenseArray{T, 1}
+mutable struct LocalVector{T <: Scalar, ReadOnly} <: DenseArray{T, 1}
   a::Array{T, 1}  # the array object constructed around the pointer
   ref::Ref{Ptr{T}}  # reference to the pointer to the data
   pobj::C.Vec{T}
   isfinalized::Bool  # has this been finalized yet
-  function LocalVector(a::Array, ref::Ref, ptr)
-    varr = new(a, ref, ptr, false)
+  function LocalVector{T,ReadOnly}(a::Array{T}, ref::Ref, ptr) where {T,ReadOnly}
+    varr = new{T,ReadOnly}(a, ref, ptr, false)
     # backup finalizer, shouldn't ever be used because users must call
     # restore before their changes will take effect
-    finalizer(varr, restore)
+    finalizer(restore, varr)
     return varr
   end
 
 end
 
-typealias LocalVectorRead{T} LocalVector{T, true}
-typealias LocalVectorWrite{T} LocalVector{T, false}
+const LocalVectorRead{T}=LocalVector{T, true}
+const LocalVectorWrite{T}=LocalVector{T, false}
 
 """
   Get the LocalVector of a vector.  Users must call restore when
   finished updating the vector
 """
-function LocalVector{T}(vec::Vec{T})
+function LocalVector(vec::Vec{T}) where {T}
 
   len = lengthlocal(vec)
 
   ref = Ref{Ptr{T}}()
   chk(C.VecGetArray(vec.p, ref))
-  a = pointer_to_array(ref[], len)
+  a = unsafe_wrap(Array, ref[], len)
   return LocalVector{T, false}(a, ref, vec.p)
 end
 
 """
+  Get the LocalVector of a vector.  Users must call restore when
+  finished updating the vector
+"""
+function LocalVector(vec::Vec{T},len::Int) where {T}
+  ref = Ref{Ptr{T}}()
+  chk(C.VecGetArray(vec.p, ref))
+  a = unsafe_wrap(Array, ref[], len)
+  return LocalVector{T, false}(a, ref, vec.p)
+end
+
+
+"""
   Tell Petsc the LocalVector is no longer being used
 """
-function restore{T}(varr::LocalVectorWrite{T})
+function restore(varr::LocalVectorWrite{T}) where {T}
 
   if !varr.isfinalized && !PetscFinalized(T) && !isfinalized(varr.pobj)
     ptr = varr.ref
     chk(C.VecRestoreArray(varr.pobj, ptr))
-  end 
+  end
   varr.isfinalized = true
 end
 
 """
-  Get the LocalVector_readonly of a vector.  Users must call restore when 
+  Get the LocalVector_readonly of a vector.  Users must call restore when
   finished with the object.
 """
-function LocalVector_readonly{T}(vec::Vec{T})
+function LocalVector_readonly(vec::Vec{T}) where {T}
 
   len = lengthlocal(vec)
 
   ref = Ref{Ptr{T}}()
   chk(C.VecGetArrayRead(vec.p, ref))
-  a = pointer_to_array(ref[], len)
+  a = unsafe_wrap(Array, ref[], len)
   return LocalVector{T, true}(a, ref, vec.p)
 end
 
-function restore{T}(varr::LocalVectorRead{T})
+function restore(varr::LocalVectorRead{T}) where {T}
 
   if !varr.isfinalized && !PetscFinalized(T) && !isfinalized(varr.pobj)
     ptr = [varr.ref[]]
     chk(C.VecRestoreArrayRead(varr.pobj, ptr))
-  end 
+  end
   varr.isfinalized = true
 end
 
@@ -1119,9 +1130,9 @@ Base.size(varr::LocalVector) = size(varr.a)
 # indexing
 getindex(varr::LocalVector, i) = getindex(varr.a, i)
 setindex!(varr::LocalVectorWrite, v, i) = setindex!(varr.a, v, i)
-Base.unsafe_convert{T}(::Type{Ptr{T}}, a::LocalVector{T}) = Base.unsafe_convert(Ptr{T}, a.a)
-Base.stride(a::LocalVector, d::Integer) = stride(a.a, d)
-Base.similar(a::LocalVector, T=eltype(a), dims=size(a)) = similar(a.a, T, dims)
+Base.unsafe_convert(::Type{Ptr{T}}, a::LocalVector{T}) where {T} = Base.unsafe_convert(Ptr{T}, a.a)
+Base.stride(a::LocalVector, d::Int64) = stride(a.a, d)
+Base.similar(a::LocalVector, T::Type=eltype(a), dims::Dims{1}=size(a)) = similar(a.a, T, dims)
 
 function (==)(x::LocalVector, y::AbstractArray)
   return x.a == y

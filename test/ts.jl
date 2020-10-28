@@ -26,7 +26,7 @@ ST = Float64
     return 0
   end
 
-  ts = TS(ST, PETSc.C.TS_LINEAR, PETSc.C.TSEULER)
+  ts = TS(ST, GridapDistributedPETScWrappers.C.TS_LINEAR, GridapDistributedPETScWrappers.C.TSEULER)
 
   set_rhs_function(ts, NullVec[ST], rhs1)
   set_rhs_jac(ts, A, A, ComputeRHSJacobianConstant)
@@ -41,9 +41,9 @@ ST = Float64
   solve!(ts, u)
   #not sure how to test this other than "doesn't explode everywhere"
   ksp = KSP(ts)
-  
+
   # same as above, but using set_ic
-  ts = TS(ST, PETSc.C.TS_LINEAR, PETSc.C.TSEULER)
+  ts = TS(ST, GridapDistributedPETScWrappers.C.TS_LINEAR, GridapDistributedPETScWrappers.C.TSEULER)
 
   set_rhs_function(ts, NullVec[ST], rhs1)
   set_rhs_jac(ts, A, A, ComputeRHSJacobianConstant)
@@ -126,7 +126,7 @@ ST = Float64
     return 0
   end
 
-  ts = TS(ST, PETSc.C.TS_LINEAR, PETSc.C.TSEULER)
+  ts = TS(ST, GridapDistributedPETScWrappers.C.TS_LINEAR, GridapDistributedPETScWrappers.C.TSEULER)
 
   A = Mat(ST, nx, nx)
   u = Vec(ST, nx)
@@ -149,8 +149,8 @@ ST = Float64
     @test u[i] ≈ u_julia[i]
   end
 
-  PETSc.PetscDestroy(ts)
-  @test PETSc.isfinalized(ts)
+  GridapDistributedPETScWrappers.PetscDestroy(ts)
+  @test GridapDistributedPETScWrappers.isfinalized(ts)
 
 
   # now solve the same problem using implicit euler
@@ -215,13 +215,13 @@ ST = Float64
       A[i, i+1] = -1/dx
     end
 
-    AssemblyBegin(A, PETSc.C.MAT_FINAL_ASSEMBLY)
-    AssemblyEnd(A, PETSc.C.MAT_FINAL_ASSEMBLY)
+    AssemblyBegin(A, GridapDistributedPETScWrappers.C.MAT_FINAL_ASSEMBLY)
+    AssemblyEnd(A, GridapDistributedPETScWrappers.C.MAT_FINAL_ASSEMBLY)
 
     return 0
   end
 
-  ts = TS(ST, PETSc.C.TS_LINEAR, PETSc.C.TSBEULER)
+  ts = TS(ST, GridapDistributedPETScWrappers.C.TS_LINEAR, GridapDistributedPETScWrappers.C.TSBEULER)
 
   A = Mat(ST, nx, nx, nz = 3)
   A[1,1] = 1.0
@@ -231,8 +231,8 @@ ST = Float64
     A[i, i] = 1.0
     A[i, i+1] = 1.0
   end
-  AssemblyBegin(A, PETSc.C.MAT_FINAL_ASSEMBLY)
-  AssemblyEnd(A, PETSc.C.MAT_FINAL_ASSEMBLY)
+  AssemblyBegin(A, GridapDistributedPETScWrappers.C.MAT_FINAL_ASSEMBLY)
+  AssemblyEnd(A, GridapDistributedPETScWrappers.C.MAT_FINAL_ASSEMBLY)
   u = Vec(ST, nx)
 
   # set IC
@@ -254,7 +254,7 @@ ST = Float64
     @test u[i] ≈ u_julia[i]
   end
 
-  PETSc.PetscDestroy(ts)
+  GridapDistributedPETScWrappers.PetscDestroy(ts)
 
 
 end

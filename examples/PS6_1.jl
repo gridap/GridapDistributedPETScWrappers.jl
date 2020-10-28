@@ -82,8 +82,8 @@ for i in localpart(u_i)
   u_i[i] = ICFunc(xmin + (i-1)*delta_x)
 end
 # assemble so we can access the values in u_i for the Neumann BC
-PETSc.AssemblyBegin(u_i)
-PETSc.AssemblyEnd(u_i)
+GridapDistributedPETScWrappers.AssemblyBegin(u_i)
+GridapDistributedPETScWrappers.AssemblyEnd(u_i)
 
 if mpi_rank == mpi_size
   u_i[idx_end] = 2*delta_x*BCR(0) + u_i[idx_end-2]
@@ -190,8 +190,8 @@ end
 println("time = ", time)
 
 # print numerical solution
-PETSc.AssemblyBegin(u_i)
-PETSc.AssemblyEnd(u_i)
+GridapDistributedPETScWrappers.AssemblyBegin(u_i)
+GridapDistributedPETScWrappers.AssemblyEnd(u_i)
 if mpi_rank == 1
   println("u_final = \n")
 end
@@ -204,8 +204,8 @@ for i in localpart(uex)
 end
 
 # print exact solution
-PETSc.AssemblyBegin(uex)
-PETSc.AssemblyEnd(uex)
+GridapDistributedPETScWrappers.AssemblyBegin(uex)
+GridapDistributedPETScWrappers.AssemblyEnd(uex)
 if mpi_rank == 1
   println("u_ex = \n")
 end
@@ -234,7 +234,7 @@ function writeU(u_i, N, tsteps)
   writedlm(fname, larr[1:(N+1)])
 end
 
-  
+
 
 
 function ICFunc(x)
@@ -268,21 +268,21 @@ function createPetscData(mat_size, stencil_size)
   mpi_size = MPI.Comm_size(MPI.COMM_WORLD)
 
   # left hand side matrix
-  A = PETSc.Mat(Float64, PETSc.C.PETSC_DECIDE, PETSc.C.PETSC_DECIDE, mlocal=mat_size, nlocal=mat_size, nz=stencil_size, onz=1, comm=MPI.COMM_WORLD)
+  A = GridapDistributedPETScWrappers.Mat(Float64, GridapDistributedPETScWrappers.C.PETSC_DECIDE, GridapDistributedPETScWrappers.C.PETSC_DECIDE, mlocal=mat_size, nlocal=mat_size, nz=stencil_size, onz=1, comm=MPI.COMM_WORLD)
   A.assembling=true
-  
+
   # solution at current timestep
-  u_i = Vec(Float64, PETSc.C.VECMPI, comm=MPI.COMM_WORLD);
+  u_i = Vec(Float64, GridapDistributedPETScWrappers.C.VECMPI, comm=MPI.COMM_WORLD);
   u_i.assembling=true
   resize!(u_i, mlocal=mat_size)
 
   # right hand side
-  rhs = Vec(Float64, PETSc.C.VECMPI, comm=MPI.COMM_WORLD);
+  rhs = Vec(Float64, GridapDistributedPETScWrappers.C.VECMPI, comm=MPI.COMM_WORLD);
   rhs.assembling=true
   resize!(rhs, mlocal=mat_size)
 
   # exact solution
-  uex = Vec(Float64, PETSc.C.VECMPI, comm=MPI.COMM_WORLD);
+  uex = Vec(Float64, GridapDistributedPETScWrappers.C.VECMPI, comm=MPI.COMM_WORLD);
   uex.assembling=true
   resize!(uex, mlocal=mat_size)
 
@@ -318,17 +318,17 @@ function createPetscData(mat_size, stencil_size)
   ghost_offset = 2*(mpi_rank-1) # offset from u_i indices to ghost indices
   # set up the vector
   nghost_local = length(idx_ghost)
-  u_ghost = Vec(Float64, PETSc.C.VECMPI, comm=MPI.COMM_WORLD);
+  u_ghost = Vec(Float64, GridapDistributedPETScWrappers.C.VECMPI, comm=MPI.COMM_WORLD);
   resize!(u_ghost, mlocal=nghost_local)
   u_ghost.assembling=true
 
   # create the scatter
-  is_local = PETSc.IS(Float64, idx, comm=MPI.COMM_WORLD)
-  is_ghost = PETSc.IS(Float64, idx_ghost, comm=MPI.COMM_WORLD)
-  vec_scatter = PETSc.VecScatter(u_i, is_local, u_ghost, is_ghost)
+  is_local = GridapDistributedPETScWrappers.IS(Float64, idx, comm=MPI.COMM_WORLD)
+  is_ghost = GridapDistributedPETScWrappers.IS(Float64, idx_ghost, comm=MPI.COMM_WORLD)
+  vec_scatter = GridapDistributedPETScWrappers.VecScatter(u_i, is_local, u_ghost, is_ghost)
 
   ctx = (is_local, is_ghost)  # avoid GC
-  ksp = PETSc.KSP(A, ksp_atol=1e-12, ksp_rtol=1e-14, ksp_monitor="")
+  ksp = GridapDistributedPETScWrappers.KSP(A, ksp_atol=1e-12, ksp_rtol=1e-14, ksp_monitor="")
 
   return A, u_i, u_ghost, vec_scatter, rhs, ksp, uex, ctx, ghost_offset
 end

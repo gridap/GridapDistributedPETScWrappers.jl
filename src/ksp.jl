@@ -7,22 +7,22 @@ export KSP, petscview
 ###########################################################################
 
 # solver context
-type KSP{T}
+mutable struct KSP{T}
   p::C.KSP{T}
-  function KSP(p::C.KSP{T})
-    o = new(p)
-    finalizer(o, PetscDestroy)
+  function KSP(p::C.KSP{T}) where {T}
+    o = new{T}(p)
+    finalizer(PetscDestroy,o)
     return o
   end
 end
 
-comm{T}(a::KSP{T}) = MPI.Comm(C.PetscObjectComm(T, a.p.pobj))
+comm(a::KSP{T}) where {T} = C.PetscObjectComm(T, a.p.pobj)
 
-function PetscDestroy{T}(o::KSP{T})
+function PetscDestroy(o::KSP{T}) where {T}
   PetscFinalized(T) || C.KSPDestroy(Ref(o.p))
 end
 
-function petscview{T}(o::KSP{T})
+function petscview(o::KSP{T}) where {T}
   viewer = C.PetscViewer{T}(C_NULL)
   chk(C.KSPView(o.p, viewer))
 end
@@ -40,7 +40,7 @@ The keyword options are zero or more of the following:
 
 These control the solver and preconditioner characteristics:
 * `ksp_type="a"`: use KSP algorithm `a`
-* `ksp_pc_side=n`: set preconditioner side to `PETSc.C.PC_LEFT`, `PETSc.C.PC_RIGHT`, or `PETSc.C.PC_SYMMETRIC`
+* `ksp_pc_side=n`: set preconditioner side to `GridapDistributedPETScWrappers.C.PC_LEFT`, `GridapDistributedPETScWrappers.C.PC_RIGHT`, or `GridapDistributedPETScWrappers.C.PC_SYMMETRIC`
 * `ksp_reuse_preconditioner=true`: use initial preconditioner and don't ever compute a new one
 * `ksp_diagonal_scale=true`: symmetrically diagonally scale `A` before solving (note that this *changes* `A` and the right-hand side in a solve, unless you also set `ksp_diagonal_scale_fix=true`)
 * `ksp_diagonal_scale_fix=true`: undo diagonal scaling after solve
@@ -59,7 +59,7 @@ iterative solvers:
 * `ksp_converged_use_min_initial_residual_norm=true`: use min of initial residual norm and `b` for computing relative convergence
 * `ksp_error_if_not_converged=true`: generate error if solver does not converge
 * `ksp_convergence_test=:default` or `:skip`: use the default convergence test (tolerances and `max_it`) or skip convergence tests and run until `max_it` is reached
-* `ksp_norm_type=n`: in residual tests, use norm type `n`, one of default (`PETSc.C.KSP_NORM_DEFAULT`), none (`PETSc.C.KSP_NORM_NONE`), of the preconditioned residual (`PETSc.C.KSP_NORM_PRECONDITIONED`), the true residual (`PETSc.C.KSP_NORM_UNPRECONDITIONED`), or the "natural" norm (`PETSc.C.KSP_NORM_NATURAL`)
+* `ksp_norm_type=n`: in residual tests, use norm type `n`, one of default (`GridapDistributedPETScWrappers.C.KSP_NORM_DEFAULT`), none (`GridapDistributedPETScWrappers.C.KSP_NORM_NONE`), of the preconditioned residual (`GridapDistributedPETScWrappers.C.KSP_NORM_PRECONDITIONED`), the true residual (`GridapDistributedPETScWrappers.C.KSP_NORM_UNPRECONDITIONED`), or the "natural" norm (`GridapDistributedPETScWrappers.C.KSP_NORM_NATURAL`)
 * `ksp_check_norm_iteration=n`: compute residual norm starting on iteration `n`
 * `ksp_lag_norm=true`: lag the calculation of the residual norm by one iteration (trades off reduced communication for an additional iteration)
 
@@ -81,7 +81,7 @@ In addition, if default preconditioner is being used,
 then any of the preconditioner options (see `PC`) can be specified to control
 this preconditioner (e.g. `pc_type`).
 """
-function KSP{T}(pc::PC{T}; kws...)
+function KSP(pc::PC{T}; kws...) where {T}
   ksp_c = Ref{C.KSP{T}}()
   chk(C.KSPCreate(comm(pc), ksp_c))
   ksp = ksp_c[]
@@ -89,15 +89,20 @@ function KSP{T}(pc::PC{T}; kws...)
   withoptions(T, kws) do
     chk(C.KSPSetFromOptions(ksp))
   end
-  return KSP{T}(ksp)
+  return KSP(ksp)
 end
 
-KSP{T}(A::Mat{T}, PA::Mat{T}=A; kws...) = KSP(PC(A, PA; kws...); kws...)
+KSP(A::Mat{T}, PA::Mat{T}=A; kws...) where {T} = KSP(PC(A, PA; kws...); kws...)
+
+export KSPSetUp!
+function KSPSetUp!(ksp::KSP{T}) where {T}
+  chk(C.KSPSetUp(ksp.p))
+end
 
 # Retrieve a reference to the matrix in the KSP object, as a raw C.Mat
 # pointer.  Note that we should not wrap this in a Mat object, or
 # call MatDestroy on it, without incrementing its reference count first!
-function _ksp_A{T}(ksp::KSP{T})
+function _ksp_A(ksp::KSP{T}) where {T}
   a = Ref{C.Mat{T}}()
   pa = Ref{C.Mat{T}}()
   chk(C.KSPGetOperators(ksp.p, a, pa))
@@ -105,40 +110,44 @@ function _ksp_A{T}(ksp::KSP{T})
 end
 
 # x = A \ b
-function Base.A_ldiv_B!{T}(ksp::KSP{T}, b::Vec{T}, x::Vec{T})
+function LinearAlgebra.ldiv!(ksp::KSP{T}, b::Vec{T}, x::Vec{T}) where {T}
 
-  assemble(_ksp_A(ksp))
-  assemble(b)
-  assemble(x)
+ assemble(_ksp_A(ksp))
+ assemble(b)
+ assemble(x)
 
-  chk(C.KSPSolve(ksp.p, b.p, x.p))
+ chk(C.KSPSolve(ksp.p, b.p, x.p))
 
-  reason = Ref{Cint}()
-  chk(C.KSPGetConvergedReason(ksp.p, reason))
-  reason[] < 0 && warn("KSP solve did not converge")
+ reason = Ref{Cint}()
+ chk(C.KSPGetConvergedReason(ksp.p, reason))
+ if (reason[] < 0)
+   @warn "KSP solve did not converge"
+ end
 
-  return x
+ return x
 end
 
 # x = A.' \ b
 # Base.At_ldiv_B! does not exist? the non bang version does
-function KSPSolveTranspose!{T}(ksp::KSP{T}, b::Vec{T}, x::Vec{T})
+function KSPSolveTranspose!(ksp::KSP{T}, b::Vec{T}, x::Vec{T}) where {T}
   assemble(_ksp_A(ksp))
   assemble(b)
   assemble(x)
-  
+
   chk(C.KSPSolveTranspose(ksp.p, b.p, x.p))
 
   reason = Ref{Cint}()
   chk(C.KSPGetConvergedReason(ksp.p, reason))
-  reason[] < 0 && warn("KSP solve did not converge")
+  if (reason[] < 0)
+    @warn "KSP solve did not converge"
+  end
 
   return x
 end
 
 # is there nice syntax for this?
 export KSPSolveTranspose
-function KSPSolveTranspose{T}(ksp::KSP{T}, b::Vec{T})
+function KSPSolveTranspose(ksp::KSP{T}, b::Vec{T}) where {T}
 
   x = similar(b, size(ksp, 1))
   KSPSolveTranspose!(ksp, b, x)
@@ -151,15 +160,14 @@ function Base.size(ksp::KSP)
   chk(C.MatGetSize(_ksp_A(ksp), m, n))
   (Int(m[]), Int(n[]))
 end
-Base.size{T}(ksp::KSP{T}, dim::Integer) = dim > 2 ? 1 : size(ksp)[dim]
+Base.size(ksp::KSP{T}, dim::Integer)  where {T} = dim > 2 ? 1 : size(ksp)[dim]
 
 import Base: \
-(\){T}(ksp::KSP{T}, b::Vec{T}) = A_ldiv_B!(ksp, b, similar(b, size(ksp, 2)))
+(\)(ksp::KSP{T}, b::Vec{T}) where {T} = ldiv!(ksp, b, similar(b, size(ksp, 2)))
 
 # Mat fallbacks
-(\){T}(A::Mat{T}, b::Vec{T}) = KSP(A)\b
-Base.A_ldiv_B!{T}(A::Mat{T}, b::Vec{T}, x::Vec{T}) = Base.A_ldiv_B!(KSP(A), b, x)
+(\)(A::Mat{T}, b::Vec{T}) where {T} = KSP(A)\b
+LinearAlgebra.ldiv!(A::Mat{T}, b::Vec{T}, x::Vec{T}) where {T} = ldiv!(KSP(A), b, x)
 
-KSPSolveTranspose{T}(A::Mat{T}, b::Vec{T}) = KSPSolveTranspose(KSP(A), b)
-KSPSolveTranspose{T}(A::Mat{T}, b::Vec{T}, x::Vec{T}) = KSPSOlveTranspose(KSP(A), x, b)
-
+KSPSolveTranspose(A::Mat{T}, b::Vec{T}) where {T} = KSPSolveTranspose(KSP(A), b)
+KSPSolveTranspose(A::Mat{T}, b::Vec{T}, x::Vec{T}) where {T} = KSPSOlveTranspose(KSP(A), x, b)

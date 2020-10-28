@@ -1,6 +1,20 @@
-# PETSc
+<!-- [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://gridap.github.io/GridapDistributed.jl/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://gridap.github.io/GridapDistributed.jl/dev) -->
+[![Build Status](https://travis-ci.com/gridap/GridapDistributedPETScWrappers.svg?branch=master)](https://travis-ci.com/gridap/GridapDistributedPETScWrappers.jl)
+[![Codecov](https://codecov.io/gh/gridap/GridapDistributedPETScWrappers.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/gridap/GridapDistributedPETScWrappers.jl)
 
-[![Build Status](https://travis-ci.org/JuliaParallel/PETSc.jl.svg?branch=master)](https://travis-ci.org/JuliaParallel/PETSc.jl)
+# GridapDistributedPETScWrappers
+
+[GridapDistributed.jl](https://github.com/gridap/GridapDistributed.jl) wrappers for [PETSc](https://www.mcs.anl.gov/petsc/) library. 
+
+This package is experimental, under development. 
+
+It was originally forked from JuliaParallel's org `PETSc.jl` (commit https://github.com/JuliaParallel/PETSc.jl/commit/3d8c46a127821aa1ff20d5892f50ec75be11c77f )
+
+Installation and basic usage instructions to be written soon ...
+
+
+<!-- [![Build Status](https://travis-ci.org/JuliaParallel/PETSc.jl.svg?branch=master)](https://travis-ci.org/JuliaParallel/PETSc.jl)
 [![codecov.io](http://codecov.io/github/JuliaParallel/PETSc.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaParallel/PETSc.jl?branch=master)
 [![Coverage Status](https://coveralls.io/repos/JuliaParallel/PETSc.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/JuliaParallel/PETSc.jl?branch=master)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://JuliaParallel.github.io/PETSc.jl/latest)
@@ -108,4 +122,4 @@ If neither of the above variables exist, a standard build is performed.
 ## Auto Generation Notes
 PETSc uses preprocessor variables to decide what code to include when compiling 
 the library.  Clang does not know what preprocessor variables were defined at 
-compile time, so it does not correctly detect the typealiases `PetscScalar`, `PetscReal`, etc.  To correctly autogenerate wrappers, the proper variables must be passed to Clang with the -D switch.  Note that users will not need to generate their own wrappers because they have already been generated and commit to the repo.
+compile time, so it does not correctly detect the typealiases `PetscScalar`, `PetscReal`, etc.  To correctly autogenerate wrappers, the proper variables must be passed to Clang with the -D switch.  Note that users will not need to generate their own wrappers because they have already been generated and commit to the repo. -->

@@ -3,34 +3,35 @@
 # underneath
 # this is WIP pending Clang getting AOs right
 export AO, map_petsc_to_app!, map_app_to_petsc!
-type AO{T}
+mutable struct AO{T}
   p::C.AO{T}
 
-  function AO(p::C.AO{T})
-    o = new(p)
-    finalizer(o, PetscDestroy)
+  function AO(p::C.AO{T}) where {T}
+    o = new{T}(p)
+    finalizer(PetscDestroy,o)
     return o
   end
 end
 
 # zero based, using arrays
-function AO_{T}(::Type{T}, app_idx::AbstractArray{PetscInt, 1}, 
-            petsc_idx::AbstractArray{PetscInt, 1}; comm=MPI.COMM_WORLD, basic=true )
+function AO_(::Type{T}, app_idx::AbstractArray{PetscInt, 1},
+            petsc_idx::AbstractArray{PetscInt, 1}; comm=MPI.COMM_WORLD, basic=true ) where {T}
   ao_ref = Ref{C.AO{T}}()
   if basic  # mapping is one-to-one and onto
-    chk(C.AOCreateBasic(comm, length(app_idx), app_idx, petsc_idx, ao_ref))
+    #chk(C.AOCreateBasic(comm, PetscInt(length(app_idx)), app_idx, petsc_idx, ao_ref))
+    chk(C.AOCreateMemoryScalable(comm, PetscInt(length(app_idx)), app_idx, petsc_idx, ao_ref))
   else  # worse performance
-    chk(C.AOCreateMapping(comm, length(app_idx), app_idx, petsc_idx, ao_ref))
+    chk(C.AOCreateMapping(comm, PetscInt(length(app_idx)), app_idx, petsc_idx, ao_ref))
   end
 
-  return AO{T}(ao_ref[])
+  return AO(ao_ref[])
 end
 
 
 # zero based, using index sets
 # because index sets are already zero based, this function can be exposed
 # directly
-function AO{T}( app_idx::IS{T}, petsc_idx::IS{T}; basic=true )
+function AO( app_idx::IS{T}, petsc_idx::IS{T}; basic=true ) where {T}
 
   ao_ref = Ref{C.AO{T}}()
   if basic  # mapping is one-to-one and onto
@@ -39,12 +40,12 @@ function AO{T}( app_idx::IS{T}, petsc_idx::IS{T}; basic=true )
     chk(C.AOCreateMappingIS(app_idx.p, petsc_idx.p, ao_ref))
   end
 
-  return AO{T}(ao_ref[])
+  return AO(ao_ref[])
 end
 
 # one based interface
-function AO{T, I1 <: Integer, I2 <: Integer}(::Type{T}, app_idx::AbstractArray{I1, 1}, 
-            petsc_idx::AbstractArray{I2, 1}; comm=MPI.COMM_WORLD, basic=true )
+function AO(::Type{T}, app_idx::AbstractArray{I1, 1},
+            petsc_idx::AbstractArray{I2, 1}; comm=MPI.COMM_WORLD, basic=true ) where {T, I1 <: Integer, I2 <: Integer}
 
   app_idx0 = PetscInt[app_idx[i] - 1 for i=1:length(app_idx)]
   petsc_idx0 = PetscInt[petsc_idx[i] - 1 for i=1:length(petsc_idx)]
@@ -52,7 +53,7 @@ function AO{T, I1 <: Integer, I2 <: Integer}(::Type{T}, app_idx::AbstractArray{I
 end
 
 
-function PetscDestroy{T}(ao::AO{T})
+function PetscDestroy(ao::AO{T}) where {T}
 
   if !PetscFinalized(T)
     chk(C.AODestroy(Ref(ao.p)))
@@ -68,7 +69,7 @@ function isfinalized(ao::C.AO)
   return ao.pobj == C_NULL
 end
 
-function petscview{T}(ao::AO{T})
+function petscview(ao::AO{T}) where {T}
   viewer = C.PetscViewer{T}(C_NULL)
   chk(C.VecView(ao.p, viewer))
 end
@@ -84,7 +85,7 @@ function map_petsc_to_app!(ao::AO, idx::AbstractArray)
     idx[i] -= 1
   end
 
-  chk(C.AOPetscToApplication(ao.p, length(idx), idx))
+  chk(C.AOPetscToApplication(ao.p, PetscInt(length(idx)), idx))
 
   # increment back to 1-based indices
    for i=1:length(idx)
@@ -103,7 +104,7 @@ function map_app_to_petsc!(ao::AO, idx::AbstractArray)
     idx[i] -= 1
   end
 
-  chk(C.AOApplicationToPetsc(ao.p, length(idx), idx))
+  chk(C.AOApplicationToPetsc(ao.p, PetscInt(length(idx)), idx))
 
   # increment back to 1-based indices
    for i=1:length(idx)

@@ -3,7 +3,4 @@
 if isfile("deps.jl")
   rm("deps.jl")
 end
-
-#Pkg.checkout("MPI", "master")
-#Pkg.build("MPI")
 include("build_petscs.jl")

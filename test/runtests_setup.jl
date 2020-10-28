@@ -1,9 +1,9 @@
-using PETSc
-if VERSION >= v"0.5.0-dev+7720"
-  using Base.Test
-else
-  using BaseTestNext
-end
+using GridapDistributedPETScWrappers
+using GridapDistributedPETScWrappers.C
+using MPI
+using LinearAlgebra
+using SparseArrays
+using Test
 
 # determine scalar type of current run
 global ST = Float64  # scalar type
@@ -48,7 +48,7 @@ function RT(x::Number)
 
 end
 
-function mymult{T}(A::PETSc.C.Mat{T}, x::PETSc.C.Vec, b::PETSc.C.Vec)
+function mymult(A::GridapDistributedPETScWrappers.C.Mat{T}, x::GridapDistributedPETScWrappers.C.Vec, b::GridapDistributedPETScWrappers.C.Vec) where {T}
 # matrix multiplication function for the shell matrix A
 # A performs the action of A = diagm(1:sys_size)
 
@@ -62,7 +62,5 @@ function mymult{T}(A::PETSc.C.Mat{T}, x::PETSc.C.Vec, b::PETSc.C.Vec)
 
   restore(localx)
   restore(localb)
-  return PETSc.C.PetscErrorCode(0)
+  return GridapDistributedPETScWrappers.C.PetscErrorCode(0)
 end
-
-

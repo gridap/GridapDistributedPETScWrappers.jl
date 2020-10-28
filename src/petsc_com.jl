@@ -20,8 +20,8 @@ function __init__()
   for i=1:3
     if have_petsc[i]
       libname = C.petsc_libs[i]
-      val = @eval(cglobal((:PetscIgnoreErrorHandler, C.$libname)))
-      C.PetscPushErrorHandler(C.petsc_type[i], val, C_NULL)
+      #val = @eval(cglobal((:PetscIgnoreErrorHandler, C.$libname)))
+      #C.PetscPushErrorHandler(C.petsc_type[i], val, C_NULL)
     end
   end
 
@@ -42,7 +42,7 @@ PetscInitialize(lib::DataType, args) = PetscInitialize(lib, args, "", "")
 function PetscInitialize(lib::DataType, args, filename, help)
   # argument list starts with program name
   args = filter(a->!isempty(a), args)
-  args = map(bytestring, vcat("julia", args))
+  args = map(string, vcat("julia", args))
 
   nargs = Int32[length(args)]
 
@@ -51,7 +51,7 @@ function PetscInitialize(lib::DataType, args, filename, help)
   args_ptr_ptr = [pointer(args_ptr)]
   args_ptr_ptr_ptr = pointer(args_ptr_ptr)
 
-  err = C.PetscInitialize(lib, nargs, args_ptr_ptr_ptr, bytestring(filename), bytestring(help))
+  err = C.PetscInitialize(lib, nargs, args_ptr_ptr_ptr, String(filename), String(help))
   if err != 0
     error("PETSc initialization error, code: $err")
   end
@@ -59,13 +59,13 @@ function PetscInitialize(lib::DataType, args, filename, help)
 end
 
 function petsc_sizeof(T::C.PetscDataType)
-  sz = Array(Csize_t, 1)
+  sz = Array{Csize_t,1}(undef,1)
   chk(C.PetscDataTypeGetSize(C.petsc_type[1], T, sz))
   sz[1]
 end
 
 function PetscFinalized(T::Type)
-  ret = Array(PetscBool, 1)
+  ret = Array{PetscBool,1}(undef,1)
   C.PetscFinalized(T, ret)
   ret[1] != 0
 end
