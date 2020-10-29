@@ -1,5 +1,7 @@
 module GridapDistributedPETScWrappers
 
+const deactivate_finalizers=true
+
 import MPI
 export PetscInt
 include(joinpath("generated", "C.jl"))

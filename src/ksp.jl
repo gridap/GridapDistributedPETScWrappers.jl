@@ -11,7 +11,9 @@ mutable struct KSP{T}
   p::C.KSP{T}
   function KSP(p::C.KSP{T}) where {T}
     o = new{T}(p)
-    finalizer(PetscDestroy,o)
+    if (!deactivate_finalizers)
+      finalizer(PetscDestroy,o)
+    end
     return o
   end
 end

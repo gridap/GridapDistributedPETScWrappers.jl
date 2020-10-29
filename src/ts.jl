@@ -12,7 +12,9 @@ mutable struct TS{T}
     push!(ts.data, data)
 
     if first_instance
-      finalizer(PetscDestroy, ts)
+      if (!deactivate_finalizers)
+        finalizer(PetscDestroy, ts)
+      end
     end
 
     return ts

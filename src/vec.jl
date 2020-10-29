@@ -27,7 +27,9 @@ mutable struct Vec{T} <: AbstractVector{T}
                verify_assembled::Bool=true) where {T}
     v = new{T}(p, false, verify_assembled, C.INSERT_VALUES, data)
     if first_instance
-      finalizer(PetscDestroy,v)
+      if (!deactivate_finalizers)
+        finalizer(PetscDestroy,v)
+      end
     end
     return v
   end
@@ -1056,7 +1058,9 @@ mutable struct LocalVector{T <: Scalar, ReadOnly} <: DenseArray{T, 1}
     varr = new{T,ReadOnly}(a, ref, ptr, false)
     # backup finalizer, shouldn't ever be used because users must call
     # restore before their changes will take effect
-    finalizer(restore, varr)
+    if (!deactivate_finalizers)
+      finalizer(restore, varr)
+    end
     return varr
   end
 

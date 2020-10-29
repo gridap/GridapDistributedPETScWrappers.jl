@@ -9,7 +9,9 @@ mutable struct IS{T}
   p::C.IS{T}
   function IS{T}(p::C.IS{T}) where {T}
     o = new{T}(p)
-    finalizer(PetscDestroy,o)
+    if (!deactivate_finalizers)
+      finalizer(PetscDestroy,o)
+    end
     return o
   end
 end
@@ -143,7 +145,9 @@ mutable struct ISLocalToGlobalMapping{T}
   p::C.ISLocalToGlobalMapping{T}
   function ISLocalToGlobalMapping{T}(p::C.ISLocalToGlobalMapping{T}) where {T}
     o = new{T}(p)
-    finalizer(PetscDestroy,o)
+    if (!deactivate_finalizers)
+      finalizer(PetscDestroy,o)
+    end
     return o
   end
 end

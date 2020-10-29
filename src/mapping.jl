@@ -8,7 +8,9 @@ mutable struct AO{T}
 
   function AO(p::C.AO{T}) where {T}
     o = new{T}(p)
-    finalizer(PetscDestroy,o)
+    if (!deactivate_finalizers)
+      finalizer(PetscDestroy,o)
+    end
     return o
   end
 end
