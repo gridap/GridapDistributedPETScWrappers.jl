@@ -29,8 +29,11 @@ for (i, name) in enumerate(build_names)
        end
     else
        binary[name]=nothing
-       have_petsc[i]=true
-       @info "Using PETSc binary provided by PETSc_jll package for PetscScalar $(name)"
+    end
+
+    if (binary[name]=="" || binary[name]==nothing)
+      @info "Using PETSc binary provided by PETSc_jll package for PetscScalar $(name)"
+      have_petsc[i]=true
     end
 
     if haskey(ENV, julia_petsc_dir)  ||
