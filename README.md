@@ -5,7 +5,7 @@
 
 # GridapDistributedPETScWrappers
 
-[GridapDistributed.jl](https://github.com/gridap/GridapDistributed.jl) wrappers for the [PETSc](https://www.mcs.anl.gov/petsc/) library. 
+[GridapDistributed.jl](https://github.com/gridap/GridapDistributed.jl) wrappers for the [PETSc](https://www.mcs.anl.gov/petsc/) library. 🚧 work in progress 🚧 
 
 ## Purpose
 
