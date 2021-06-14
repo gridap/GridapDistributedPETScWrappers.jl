@@ -869,7 +869,7 @@ function (==)(x::Vec, y::AbstractArray)
     buf[1] = recbuf[1]
   end
 
-  MPI.Bcast!(buf, 1, 0, comm(x))
+  MPI.Bcast!(view(buf,1:1), 0, comm(x))
 
   return convert(Bool, buf[1])
 end
